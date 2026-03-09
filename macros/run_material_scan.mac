@@ -1,0 +1,199 @@
+# ============================================================
+#  macros/run_material_scan.mac
+#  Full material scan: Al, Fe, Cu, Pb at 1, 2, 4 GeV
+#  Thicknesses in X0 units: 0.5, 1, 2, 3, 4 (5 for Fe/Cu/Pb)
+#
+#  Al  X0=8.897cm: 0.5X0=44.5mm, 1X0=89mm, 2X0=178mm, 3X0=267mm, 4X0=356mm
+#      (capped at 4X0 — 5X0=445mm too bulky to mount)
+#  Fe  X0=1.757cm: 0.5X0=8.8mm,  1X0=17.6mm, 2X0=35.1mm, 3X0=52.7mm, 4X0=70.3mm, 5X0=87.9mm
+#  Cu  X0=1.436cm: 0.5X0=7.2mm,  1X0=14.4mm, 2X0=28.7mm, 3X0=43.1mm, 4X0=57.4mm, 5X0=71.8mm
+#  Pb  X0=0.5612cm:0.5X0=2.8mm,  1X0=5.6mm,  2X0=11.2mm, 3X0=16.8mm, 4X0=22.4mm, 5X0=28.1mm
+# ============================================================
+
+/run/initialize
+/run/verbose 1
+/event/verbose 0
+/tracking/verbose 0
+
+# ════════════════════════════════════════════════
+#  ALUMINIUM  (Z=13, X0=8.897 cm, Ec=42.3 MeV)
+# ════════════════════════════════════════════════
+/det/setAbsorberMaterial G4_Al
+
+/gun/energy 1 GeV
+/det/setAbsorberThickness 44.5 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 89.0 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 178.0 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 267.0 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 356.0 mm
+/run/beamOn 2000
+
+/gun/energy 2 GeV
+/det/setAbsorberThickness 44.5 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 89.0 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 178.0 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 267.0 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 356.0 mm
+/run/beamOn 2000
+
+/gun/energy 4 GeV
+/det/setAbsorberThickness 44.5 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 89.0 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 178.0 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 267.0 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 356.0 mm
+/run/beamOn 2000
+
+# ════════════════════════════════════════════════
+#  IRON  (Z=26, X0=1.757 cm, Ec=21.2 MeV)
+# ════════════════════════════════════════════════
+/det/setAbsorberMaterial G4_Fe
+
+/gun/energy 1 GeV
+/det/setAbsorberThickness 8.79 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 17.57 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 35.14 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 52.71 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 70.28 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 87.85 mm
+/run/beamOn 2000
+
+/gun/energy 2 GeV
+/det/setAbsorberThickness 8.79 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 17.57 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 35.14 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 52.71 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 70.28 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 87.85 mm
+/run/beamOn 2000
+
+/gun/energy 4 GeV
+/det/setAbsorberThickness 8.79 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 17.57 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 35.14 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 52.71 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 70.28 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 87.85 mm
+/run/beamOn 2000
+
+# ════════════════════════════════════════════════
+#  COPPER  (Z=29, X0=1.436 cm, Ec=19.0 MeV)
+# ════════════════════════════════════════════════
+/det/setAbsorberMaterial G4_Cu
+
+/gun/energy 1 GeV
+/det/setAbsorberThickness 7.18 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 14.36 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 28.72 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 43.08 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 57.44 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 71.80 mm
+/run/beamOn 2000
+
+/gun/energy 2 GeV
+/det/setAbsorberThickness 7.18 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 14.36 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 28.72 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 43.08 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 57.44 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 71.80 mm
+/run/beamOn 2000
+
+/gun/energy 4 GeV
+/det/setAbsorberThickness 7.18 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 14.36 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 28.72 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 43.08 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 57.44 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 71.80 mm
+/run/beamOn 2000
+
+# ════════════════════════════════════════════════
+#  LEAD  (Z=82, X0=0.5612 cm, Ec=6.71 MeV)
+#  Note: confirm lead handling protocol with CERN safety first
+# ════════════════════════════════════════════════
+/det/setAbsorberMaterial G4_Pb
+
+/gun/energy 1 GeV
+/det/setAbsorberThickness 2.81 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 5.61 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 11.22 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 16.84 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 22.45 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 28.06 mm
+/run/beamOn 2000
+
+/gun/energy 2 GeV
+/det/setAbsorberThickness 2.81 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 5.61 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 11.22 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 16.84 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 22.45 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 28.06 mm
+/run/beamOn 2000
+
+/gun/energy 4 GeV
+/det/setAbsorberThickness 2.81 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 5.61 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 11.22 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 16.84 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 22.45 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 28.06 mm
+/run/beamOn 2000

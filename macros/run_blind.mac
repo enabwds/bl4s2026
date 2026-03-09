@@ -1,0 +1,61 @@
+# ============================================================
+#  macros/run_blind.mac
+#  Blind test: Brass (70% Cu, 30% Zn)
+#  Effective Z ≈ 27.4, effective X0 ≈ 1.54 cm
+#
+#  *** SEALED — do not reveal composition to ML/analysis team
+#  *** until after blind prediction is recorded
+#
+#  Alternative: replace "Brass" with "G4_W" for tungsten
+#  (harder challenge — extrapolates beyond training range)
+# ============================================================
+
+/run/initialize
+/det/setAbsorberMaterial Brass
+/run/verbose 1
+/event/verbose 0
+/tracking/verbose 0
+
+# Same thickness grid as training materials (in mm)
+# 0.5, 1, 2, 3, 4, 5 X0 using X0≈1.54cm
+/gun/energy 1 GeV
+/det/setAbsorberThickness 7.7 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 15.4 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 30.8 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 46.2 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 61.6 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 77.0 mm
+/run/beamOn 2000
+
+/gun/energy 2 GeV
+/det/setAbsorberThickness 7.7 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 15.4 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 30.8 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 46.2 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 61.6 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 77.0 mm
+/run/beamOn 2000
+
+/gun/energy 4 GeV
+/det/setAbsorberThickness 7.7 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 15.4 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 30.8 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 46.2 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 61.6 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 77.0 mm
+/run/beamOn 2000

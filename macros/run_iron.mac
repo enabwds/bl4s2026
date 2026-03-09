@@ -1,0 +1,80 @@
+# ============================================================
+#  macros/run_iron.mac
+#  Iron absorber thickness scan at 1, 2, 4 GeV
+#
+#  Iron: Z=26, X0=1.757 cm, Ec=21.2 MeV, RM=1.72 cm
+#  Thicknesses: 0.5, 1, 2, 3, 4, 5 X0
+#    = 0.879, 1.757, 3.514, 5.271, 7.028, 8.785 cm
+# ============================================================
+
+# Single-threaded mode avoids MT geometry reinitialisation crashes
+
+/run/initialize
+/det/setAbsorberMaterial G4_Fe
+/run/verbose 1
+/event/verbose 0
+/tracking/verbose 0
+
+# ── 1 GeV ────────────────────────────────────────────────────
+/gun/particle e-
+/gun/energy 1 GeV
+
+/det/setAbsorberThickness 8.79 mm
+/run/beamOn 2000
+
+/det/setAbsorberThickness 17.57 mm
+/run/beamOn 2000
+
+/det/setAbsorberThickness 35.14 mm
+/run/beamOn 2000
+
+/det/setAbsorberThickness 52.71 mm
+/run/beamOn 2000
+
+/det/setAbsorberThickness 70.28 mm
+/run/beamOn 2000
+
+/det/setAbsorberThickness 87.85 mm
+/run/beamOn 2000
+
+# ── 2 GeV ────────────────────────────────────────────────────
+/gun/energy 2 GeV
+
+/det/setAbsorberThickness 8.79 mm
+/run/beamOn 2000
+
+/det/setAbsorberThickness 17.57 mm
+/run/beamOn 2000
+
+/det/setAbsorberThickness 35.14 mm
+/run/beamOn 2000
+
+/det/setAbsorberThickness 52.71 mm
+/run/beamOn 2000
+
+/det/setAbsorberThickness 70.28 mm
+/run/beamOn 2000
+
+/det/setAbsorberThickness 87.85 mm
+/run/beamOn 2000
+
+# ── 4 GeV ────────────────────────────────────────────────────
+/gun/energy 4 GeV
+
+/det/setAbsorberThickness 8.79 mm
+/run/beamOn 2000
+
+/det/setAbsorberThickness 17.57 mm
+/run/beamOn 2000
+
+/det/setAbsorberThickness 35.14 mm
+/run/beamOn 2000
+
+/det/setAbsorberThickness 52.71 mm
+/run/beamOn 2000
+
+/det/setAbsorberThickness 70.28 mm
+/run/beamOn 2000
+
+/det/setAbsorberThickness 87.85 mm
+/run/beamOn 2000
