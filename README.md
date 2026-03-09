@@ -160,7 +160,7 @@ Etotal_GeV, CoreFraction, ShowerWidth_cm
 ### Analyse results
 
 ```bash
-pip install pandas numpy matplotlib
+pip install pandas numpy matplotlib seaborn
 python analyse_shower.py shower_output.csv
 ```
 
@@ -217,7 +217,7 @@ Train a model (e.g. Random Forest, neural network) on simulated data, then apply
 ### Heitler model check
 The depth of shower maximum scales as:
 ```
-t_max = ln(E₀ / Ec) / ln(2)   [in units of X₀]
+t_max = ln(E₀ / Ec)   [in units of X₀]
 ```
 Scan beam energy from 1–4 GeV with a fixed absorber and verify this logarithmic dependence through the change in `CoreFraction` vs thickness.
 

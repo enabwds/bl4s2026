@@ -293,7 +293,7 @@ public:
             G4RunManager::GetRunManager()->GetUserDetectorConstruction());
         std::string material    = det->GetAbsorberMaterial()->GetName();
         double      thickMM     = det->GetAbsorberThickness();
-        double      thickX0     = (det->GetAbsorberThickness()*mm) /
+        double      thickX0     = (thickMM * mm) /
                                    det->GetAbsorberMaterial()->GetRadlen();
 
         // ── Reset noise filter on configuration change ────────────────

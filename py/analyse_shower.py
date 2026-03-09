@@ -218,6 +218,8 @@ for ax, E in zip(axes, energies):
             sub[[f'E_block_{row*4+col}_GeV' for row in range(4)]].values.sum()
             for col in range(4)
         ])
+        # Note: normalisation is by column sums (4-column total), not 16-block total.
+        # For well-contained showers these are identical; edge events may differ slightly.
         total = col_E.sum()
         if total > 0:
             col_E /= total

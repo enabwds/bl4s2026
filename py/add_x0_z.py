@@ -19,6 +19,7 @@ X0_map = {
     'G4_Fe': 1.757,   # cm
     'G4_Cu': 1.436,   # cm
     'G4_Pb': 0.5612,  # cm
+    'Brass': 1.54,    # cm (70% Cu, 30% Zn) — add after unblinding run_blind.mac
 }
 
 Z_map = {
@@ -26,6 +27,7 @@ Z_map = {
     'G4_Fe': 26,
     'G4_Cu': 29,
     'G4_Pb': 82,
+    'Brass': 27.4,    # effective Z (70% Cu @ Z=29, 30% Zn @ Z=30)
 }
 
 density_map = {          # g/cm³ — useful for later analysis
@@ -33,6 +35,7 @@ density_map = {          # g/cm³ — useful for later analysis
     'G4_Fe': 7.87,
     'G4_Cu': 8.96,
     'G4_Pb': 11.35,
+    'Brass': 8.5,     # typical brass density
 }
 
 critical_energy_map = {  # MeV — energy where ionisation = radiation loss
@@ -40,6 +43,7 @@ critical_energy_map = {  # MeV — energy where ionisation = radiation loss
     'G4_Fe': 21.2,
     'G4_Cu': 19.0,
     'G4_Pb':  6.71,
+    'Brass': 19.2,    # interpolated between Cu and Zn
 }
 
 moliere_radius_map = {   # cm — sets lateral shower scale
@@ -47,6 +51,7 @@ moliere_radius_map = {   # cm — sets lateral shower scale
     'G4_Fe': 1.72,
     'G4_Cu': 1.57,
     'G4_Pb': 1.60,
+    'Brass': 1.59,    # very similar to Cu (high-Z, similar shower structure)
 }
 
 # ── Argument parsing ───────────────────────────────────────────────────────

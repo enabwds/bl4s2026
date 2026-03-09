@@ -1,7 +1,7 @@
 // ============================================================
 //  BL4S_sim.cc  –  Main entry point
 //  Electromagnetic Shower / Inverse Material Characterisation
-//  Beams for Schools 2025 experiment
+//  Beams for Schools 2026 experiment
 // ============================================================
 //
 //  HOW TO BUILD (once GEANT4 is installed & sourced):

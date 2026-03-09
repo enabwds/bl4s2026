@@ -4,7 +4,9 @@
 #  Thicknesses in X0 units: 0.5, 1, 2, 3, 4 (5 for Fe/Cu/Pb)
 #
 #  Al  X0=8.897cm: 0.5X0=44.5mm, 1X0=89mm, 2X0=178mm, 3X0=267mm, 4X0=356mm
-#      (capped at 4X0 — 5X0=445mm too bulky to mount)
+#      (capped at 4X0 — 5X0=445mm too bulky to mount in experimental apparatus,
+#       but simulation has no such constraint; 5X0 point excluded from ML training
+#       to maintain asymmetry with physical experiment)
 #  Fe  X0=1.757cm: 0.5X0=8.8mm,  1X0=17.6mm, 2X0=35.1mm, 3X0=52.7mm, 4X0=70.3mm, 5X0=87.9mm
 #  Cu  X0=1.436cm: 0.5X0=7.2mm,  1X0=14.4mm, 2X0=28.7mm, 3X0=43.1mm, 4X0=57.4mm, 5X0=71.8mm
 #  Pb  X0=0.5612cm:0.5X0=2.8mm,  1X0=5.6mm,  2X0=11.2mm, 3X0=16.8mm, 4X0=22.4mm, 5X0=28.1mm

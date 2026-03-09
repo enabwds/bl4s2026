@@ -121,8 +121,9 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     G4Material* air     = nist->FindOrBuildMaterial("G4_AIR");
 
     // ── WORLD ────────────────────────────────────────────────────────
-    // Large enough to hold full beamline: 400 cm long, 60×60 cm face
-    auto* worldSolid = new G4Box("World", 30.*cm, 30.*cm, 200.*cm);
+    // Large enough to hold full beamline including upstream beam start
+    // and full calorimeter depth: 460 cm long, 60×60 cm face
+    auto* worldSolid = new G4Box("World", 30.*cm, 30.*cm, 230.*cm);
     auto* worldLV    = new G4LogicalVolume(worldSolid, air, "World");
     auto* worldPV    = new G4PVPlacement(nullptr, G4ThreeVector(),
                                           worldLV, "World",
@@ -317,12 +318,32 @@ void DetectorConstruction::SetAbsorberMaterial(const G4String& name)
 void DetectorConstruction::SetAbsorberThickness(G4double t)
 {
     fAbsorberThickness = t / mm;
-    // Full geometry rebuild so both the solid size AND the centre position
-    // (which depends on thickness via kAbsorberDownstreamZ - halfZ) update
-    // together. In-place SetZHalfLength() only resized the solid but left
-    // the placement centre fixed at z=-20cm, causing the downstream face
-    // to drift by up to ~4cm across the thickness scan.
-    G4RunManager::GetRunManager()->ReinitializeGeometry();
+
+    // In-place update (MT-safer than full ReinitializeGeometry in thickness scans):
+    // keep absorber downstream face fixed at kAbsorberDownstreamZ while updating
+    // both solid half-length and physical placement centre.
+    auto* geomMgr = G4GeometryManager::GetInstance();
+    geomMgr->OpenGeometry();
+
+    G4double absorberHalfZ   = 0.5 * fAbsorberThickness * mm;
+    G4double absorberCentreZ = kAbsorberDownstreamZ*cm - absorberHalfZ;
+
+    auto* solidStore = G4SolidStore::GetInstance();
+    auto* absorberSolid = dynamic_cast<G4Box*>(
+        solidStore->GetSolid("Absorber", false));
+    if (absorberSolid) {
+        absorberSolid->SetZHalfLength(absorberHalfZ);
+    }
+
+    auto* pvStore = G4PhysicalVolumeStore::GetInstance();
+    auto* absorberPV = pvStore->GetVolume("Absorber", false);
+    if (absorberPV) {
+        absorberPV->SetTranslation(G4ThreeVector(0, 0, absorberCentreZ));
+    }
+
+    geomMgr->CloseGeometry(true, false);
+    G4RunManager::GetRunManager()->GeometryHasBeenModified();
+    G4RunManager::GetRunManager()->PhysicsHasBeenModified();
     PrintParameters();
 }
 

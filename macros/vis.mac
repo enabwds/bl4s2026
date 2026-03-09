@@ -1,0 +1,29 @@
+# ============================================================
+#  macros/vis.mac
+#  Interactive visualisation: minimal example with 5 events
+#  Opens GEANT4 visualization window (OpenGL or Qt)
+# ============================================================
+
+/run/initialize
+
+# Set up the default visualisation
+/vis/open OGL 600x600-0+0
+
+# Draw the world volume
+/vis/drawVolume
+
+# Specify view angle
+/vis/viewer/set/viewpointThetaPhi 90. 0.
+
+# Draw trajectories at the end of each event
+/vis/scene/add/trajectories smooth
+
+# Accumulate multiple events in the view
+/vis/scene/endOfEventAction accumulate
+
+# Run a few events
+/gun/energy 2 GeV
+/det/setAbsorberMaterial G4_Al
+/det/setAbsorberThickness 89.0 mm
+/run/beamOn 5
+
