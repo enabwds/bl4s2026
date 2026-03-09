@@ -27,18 +27,22 @@ public:
     void ConstructSDandField() override;
 
     void SetAbsorberMaterial(const G4String& name);
-    void SetAbsorberThickness(G4double thickness);  // in G4 internal units (mm)
+    void SetAbsorberThickness(G4double thickness);  // must be in G4 internal units (pass value * mm)
 
     const G4Material* GetAbsorberMaterial() const { return fAbsorberMaterial; }
+    // Returns thickness in G4 internal units. Divide by mm to get mm value.
     G4double          GetAbsorberThickness() const { return fAbsorberThickness; }
 
 private:
     void DefineMaterials();
     void PrintParameters() const;
 
-    // Absorber slab
+    // Absorber slab — fAbsorberThickness stored in G4 internal units (mm=1).
+    // Default: 17.57 mm = 1 X0 of iron (X0_Fe = 1.757 cm).
+    // The literal 17.57 is already in internal units because mm=1 in GEANT4,
+    // so no unit header is needed here.
     G4Material* fAbsorberMaterial  = nullptr;
-    G4double    fAbsorberThickness = 17.57;  // mm — default: 1 X0 of iron (1.757 cm)
+    G4double    fAbsorberThickness = 17.57;  // G4 internal units (= 17.57 mm)
 
     // Real BL4S calorimeter block dimensions
     static constexpr int    kNcols       = 4;

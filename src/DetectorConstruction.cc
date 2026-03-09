@@ -3,15 +3,18 @@
 // ============================================================
 //  GEOMETRY OVERVIEW (beam travels along +Z):
 //
-//  [Cherenkov 1] [Cherenkov 2] [DWC 1] [DWC 2]
-//       z=-300        z=-250    z=-200   z=-150
+//  [ChkvWin1]  [ChkvGas1]       [ChkvWin2]  [ChkvGas2]
+//   z=-190cm   centre=-164.90    z=-139.85   centre=-114.80
+//   (flush, no gaps between window and gas volumes)
 //
-//  [Scint 1]  [Absorber slab]  [Scint 2]  [4×4 PbGlass array]
-//    z=-100       z=-50          z=-10        z=0 → z=37cm
+//  [DWC 1]  [DWC 2]  [Scint 1]  [Absorber slab]  [Scint 2]  [4×4 PbGlass array]
+//   z=-85cm   z=-70cm   z=-40cm   downstream       z=-5cm      z=0 → z=+37cm
+//                                 face at z=-6cm
 //
 //  Real BL4S block dimensions: 10×10×37 cm each, 4×4 = 40×40 cm face
 //  Beam spot: 2 cm diameter circular cross-section
 //  Beam divergence: ~1 mrad
+//  Beam gun origin: z = -191 cm (1 cm upstream of ChkvWindow1 front face)
 // ============================================================
 
 #include "DetectorConstruction.hh"
@@ -20,7 +23,6 @@
 
 #include "G4NistManager.hh"
 #include "G4Box.hh"
-#include "G4Tubs.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4SDManager.hh"
@@ -55,22 +57,34 @@ void DetectorConstruction::DefineMaterials()
     //  G4_Al       |  13 |   2.70     |  8.897  |  42.3    |  4.4
     //  G4_Fe       |  26 |   7.87     |  1.757  |  21.2    |  1.72
     //  G4_Cu       |  29 |   8.96     |  1.436  |  19.0    |  1.57
-    //  G4_Pb       |  82 | 11.35      |  0.5612 |   6.71   |  1.60
+    //  G4_Pb       |  82 | 11.35      |  0.5612 |   7.43   |  1.60  (Ec: PDG 2023 electron value)
     nist->FindOrBuildMaterial("G4_Al");
     nist->FindOrBuildMaterial("G4_Fe");
     nist->FindOrBuildMaterial("G4_Cu");
     nist->FindOrBuildMaterial("G4_Pb");
     nist->FindOrBuildMaterial("G4_AIR");
     // ── Lead glass (BL4S calorimeter blocks) ─────────────────────────
-    // Composition: ~65% SiO2, ~35% PbO by mass (SF5 type lead glass)
-    // Density: 3.86 g/cm³, X0 ≈ 2.37 cm, ~18 X0 in 37 cm depth
+    // SF5-type lead glass: ~51% PbO + ~49% SiO2 by mass.
+    // Converting oxide fractions to elemental mass fractions:
+    //   PbO (51%): Pb = 0.51 * (207.2/223.2) = 0.474
+    //              O  = 0.51 * ( 16.0/223.2) = 0.037
+    //   SiO2(49%): Si = 0.49 * ( 28.1/60.1)  = 0.229
+    //              O  = 0.49 * ( 32.0/60.1)  = 0.261
+    //   Total O = 0.037 + 0.261 = 0.298 (rounded so fractions sum to 1.000)
+    // Density: 3.86 g/cm3.
+    // Published SF5 X0 ~ 2.39-2.46 cm (density 3.86 g/cm3), giving ~15-16 X0
+    // in 37 cm depth — sufficient to contain GeV-scale EM showers (need ~20 X0
+    // for full containment; ~1-2% leakage expected at 4 GeV).
+    // GEANT4 computes X0 internally via the Tsai formula; the simple Bragg
+    // additivity rule underestimates X0 for high-Z mixtures so do not use it
+    // to cross-check this value.
     G4Element* Si = nist->FindOrBuildElement("Si");
     G4Element* Pb = nist->FindOrBuildElement("Pb");
     G4Element* Ox = nist->FindOrBuildElement("O");
     auto* leadGlass = new G4Material("LeadGlass", 3.86*g/cm3, 3);
-    leadGlass->AddElement(Pb, 0.214);   // mass fraction
-    leadGlass->AddElement(Si, 0.192);
-    leadGlass->AddElement(Ox, 0.594);
+    leadGlass->AddElement(Pb, 0.474);   // mass fraction — SF5 spec
+    leadGlass->AddElement(Si, 0.229);
+    leadGlass->AddElement(Ox, 0.297);   // sums to 1.000
 
     // ── Brass (blind test material: 70% Cu, 30% Zn by mass) ─────────
     // Effective Z ≈ 27.4, effective X0 ≈ 1.54 cm
@@ -96,12 +110,19 @@ void DetectorConstruction::DefineMaterials()
     G4Element* Ar = nist->FindOrBuildElement("Ar");
     G4Element* C  = nist->FindOrBuildElement("C");
     G4Element* O  = nist->FindOrBuildElement("O");
-    // Approximate ArCO2 as a mixture
-    G4double arco2Density = 1.72e-3 * g/cm3;  // at STP
+    // Ar/CO2 80:20 by volume at STP.
+    // rho = 0.80*rho_Ar + 0.20*rho_CO2 = 0.80*1.784e-3 + 0.20*1.977e-3
+    //     = 1.427e-3 + 0.395e-3 = 1.822e-3 g/cm3
+    // Mass fractions from mole fractions (80% Ar, 20% CO2):
+    //   M_Ar=39.948, M_CO2=44.009 -> M_mix = 0.80*39.948 + 0.20*44.009 = 40.760
+    //   w_Ar = 0.80*39.948/40.760 = 0.7841
+    //   w_C  = 0.20*12.011/40.760 = 0.0589
+    //   w_O  = 0.20*31.998/40.760 = 0.1570  (sum = 1.0000)
+    G4double arco2Density = 1.822e-3 * g/cm3;  // at STP (corrected)
     auto* arco2 = new G4Material("ArCO2_80_20", arco2Density, 3);
-    arco2->AddElement(Ar, 0.783);
-    arco2->AddElement(C,  0.059);
-    arco2->AddElement(O,  0.158);
+    arco2->AddElement(Ar, 0.7841);
+    arco2->AddElement(C,  0.0589);
+    arco2->AddElement(O,  0.1570);
 
     (void)brass; (void)arco2;  // suppress unused warnings
 }
@@ -130,9 +151,14 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     worldLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 
     // ── CHERENKOV DETECTORS (1 & 2) ──────────────────────────────────
-    // Each detector: 1mm Al window + 50cm gas volume, no overlaps
-    // Cherenkov 1: window at z=-190, gas z=-189 to z=-139
-    // Cherenkov 2: window at z=-130, gas z=-129 to z=-79
+    // Each detector: 1 mm (0.1 cm) Al window + 50 cm gas volume.
+    // Volumes are placed flush — no gaps, no overlaps.
+    //
+    // Layout (all values = centre position, half-extents in parentheses):
+    //   ChkvWindow1: centre=-189.95 cm (halfZ=0.05) -> front=-190.00, back=-189.90
+    //   ChkvGas1:    centre=-164.90 cm (halfZ=25.0)  -> front=-189.90, back=-139.90
+    //   ChkvWindow2: centre=-139.85 cm (halfZ=0.05) -> front=-139.90, back=-139.80
+    //   ChkvGas2:    centre=-114.80 cm (halfZ=25.0)  -> front=-139.80, back= -89.80
     G4Material* co2      = nist->FindOrBuildMaterial("G4_CARBON_DIOXIDE");
     G4Material* alMat    = nist->FindOrBuildMaterial("G4_Al");
     auto* chkvWindowSolid = new G4Box("ChkvWindow", 5.*cm, 5.*cm, 0.05*cm);
@@ -142,11 +168,11 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     auto* chkvWindowLV2   = new G4LogicalVolume(chkvWindowSolid, alMat, "ChkvWindow2");
     auto* chkvGasLV2      = new G4LogicalVolume(chkvGasSolid,    co2,   "ChkvGas2");
 
-    // Window at front, gas immediately behind (no gap, no overlap)
+    // Centres calculated so each volume's back face = next volume's front face.
     new G4PVPlacement(nullptr, G4ThreeVector(0,0,-189.95*cm), chkvWindowLV1, "ChkvWindow1", worldLV, false, 0, true);
-    new G4PVPlacement(nullptr, G4ThreeVector(0,0,-164.00*cm), chkvGasLV1,    "ChkvGas1",    worldLV, false, 0, true);
-    new G4PVPlacement(nullptr, G4ThreeVector(0,0,-138.95*cm), chkvWindowLV2, "ChkvWindow2", worldLV, false, 1, true);
-    new G4PVPlacement(nullptr, G4ThreeVector(0,0,-113.00*cm), chkvGasLV2,    "ChkvGas2",    worldLV, false, 1, true);
+    new G4PVPlacement(nullptr, G4ThreeVector(0,0,-164.90*cm), chkvGasLV1,    "ChkvGas1",    worldLV, false, 0, true);
+    new G4PVPlacement(nullptr, G4ThreeVector(0,0,-139.85*cm), chkvWindowLV2, "ChkvWindow2", worldLV, false, 1, true);
+    new G4PVPlacement(nullptr, G4ThreeVector(0,0,-114.80*cm), chkvGasLV2,    "ChkvGas2",    worldLV, false, 1, true);
 
     auto* chkvVis = new G4VisAttributes(G4Colour(0.8, 0.8, 0.0, 0.3));
     chkvVis->SetForceSolid(true);
@@ -188,7 +214,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     // Must be wide enough to catch full beam halo (beam spot = 2 cm diam).
     // Downstream face anchored at kAbsorberDownstreamZ so the air gap to
     // the calorimeter stays constant regardless of absorber thickness.
-    G4double absorberHalfZ   = 0.5 * fAbsorberThickness * mm;
+    // fAbsorberThickness is stored in GEANT4 internal units (mm=1).
+    G4double absorberHalfZ   = 0.5 * fAbsorberThickness;
     G4double absorberCentreZ = kAbsorberDownstreamZ*cm - absorberHalfZ;
     auto* absorberSolid = new G4Box("Absorber",
         10.*cm, 10.*cm, absorberHalfZ);
@@ -210,8 +237,9 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
     // ── CALORIMETER ARRAY (4×4 lead-glass blocks) ────────────────────
     // Real BL4S specs: 10×10×37 cm blocks, 4×4 array = 40×40 cm face
-    // ~18 radiation lengths in lead glass — fully contains GeV EM showers
-    // Energy resolution: σ_E/E = 0.02% ⊕ 6.3%/√E
+    // Published SF5 lead glass X0 ~2.39-2.46 cm -> ~15-16 X0 in 37 cm depth.
+    // Containment is adequate for 1-2 GeV; ~1-2% longitudinal leakage at 4 GeV.
+    // Energy resolution: sigma_E/E = 0.02% + 6.3%/sqrt(E)
     G4Material* pbGlass   = G4Material::GetMaterial("LeadGlass");
     G4double caloFrontZ   = 0.*cm;   // front face at z=0
     G4double caloHalfZ    = 0.5 * kBlockSizeZ * cm;
@@ -316,12 +344,14 @@ void DetectorConstruction::SetAbsorberMaterial(const G4String& name)
 
 void DetectorConstruction::SetAbsorberThickness(G4double t)
 {
-    fAbsorberThickness = t / mm;
+    // t arrives from G4UIcmdWithADoubleAndUnit already in GEANT4 internal
+    // units (mm = 1). Store directly — do NOT divide by mm.
+    fAbsorberThickness = t;
     // Full geometry rebuild so both the solid size AND the centre position
     // (which depends on thickness via kAbsorberDownstreamZ - halfZ) update
     // together. In-place SetZHalfLength() only resized the solid but left
-    // the placement centre fixed at z=-20cm, causing the downstream face
-    // to drift by up to ~4cm across the thickness scan.
+    // the placement centre fixed, causing the downstream face to drift by
+    // up to ~4 cm across the thickness scan.
     G4RunManager::GetRunManager()->ReinitializeGeometry();
     PrintParameters();
 }
@@ -332,13 +362,13 @@ void DetectorConstruction::PrintParameters() const
     G4double X0 = fAbsorberMaterial->GetRadlen();
     G4cout << "\n──── Detector Parameters ──────────────────────────────────────\n"
            << "  Absorber material  : " << fAbsorberMaterial->GetName() << "\n"
-           << "  Absorber thickness : " << fAbsorberThickness << " mm"
-           << "  (" << (fAbsorberThickness*mm)/X0 << " X0)\n"
+           << "  Absorber thickness : " << fAbsorberThickness/mm << " mm"
+           << "  (" << fAbsorberThickness/X0 << " X0)\n"
            << "  Radiation length   : " << X0/cm << " cm\n"
-           << "  Calorimeter        : " << kNrows << "×" << kNcols
-           << " blocks, each " << kBlockSizeXY << "×" << kBlockSizeXY
-           << "×" << kBlockSizeZ << " cm\n"
+           << "  Calorimeter        : " << kNrows << "x" << kNcols
+           << " blocks, each " << kBlockSizeXY << "x" << kBlockSizeXY
+           << "x" << kBlockSizeZ << " cm\n"
            << "  Calo face area     : "
-           << kNcols*kBlockSizeXY << "×" << kNrows*kBlockSizeXY << " cm\n"
+           << kNcols*kBlockSizeXY << "x" << kNrows*kBlockSizeXY << " cm\n"
            << "───────────────────────────────────────────────────────────────\n";
 }

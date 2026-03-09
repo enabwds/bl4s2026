@@ -14,7 +14,6 @@ Produces 7 physics validation plots:
   7. Correlation matrix of all observables
 """
 
-import sys
 import os
 import argparse
 import numpy as np
@@ -85,7 +84,7 @@ ax.plot(E_ref, 6.3 / np.sqrt(E_ref), 'k--', linewidth=1.5,
         label='BL4S spec: 6.3%/√E', alpha=0.7)
 ax.set_xlabel('Beam Energy (GeV)', fontsize=12)
 ax.set_ylabel('Energy Resolution σ/E (%)', fontsize=12)
-ax.set_title('Energy Resolution vs Beam Energy (0.5 X₀ absorber)', fontsize=13)
+ax.set_title('Energy Resolution vs Beam Energy (absorber < 0.75 X0)', fontsize=13)
 ax.legend(fontsize=10)
 ax.grid(True, alpha=0.3)
 ax.set_xlim(0.5, 5)
@@ -183,7 +182,7 @@ for ax, mat in zip(axes, materials):
     mean_E = sub[BLOCK_COLS].mean().values.reshape(4, 4)
     im = ax.imshow(mean_E, cmap='hot', origin='lower', aspect='equal')
     plt.colorbar(im, ax=ax, label='Mean Energy (GeV)')
-    ax.set_title(f'{LABELS[mat]}\n(0.5 X₀ absorber)', fontsize=11)
+    ax.set_title(f'{LABELS[mat]}\n(absorber < 25th percentile X0)', fontsize=11)
     ax.set_xlabel('Column (X)', fontsize=10)
     ax.set_ylabel('Row (Y)', fontsize=10)
     ax.set_xticks([0,1,2,3]); ax.set_xticklabels(tick_labels, fontsize=8)
@@ -229,7 +228,7 @@ for ax, E in zip(axes, energies):
     ax.grid(True, alpha=0.3)
     ax.legend(fontsize=9)
 axes[0].set_ylabel('Normalised Energy Fraction per Column', fontsize=11)
-fig.suptitle('Lateral Shower Profile per Material\n(0.5 X₀ — narrower = higher Z / smaller Molière radius)',
+fig.suptitle('Lateral Shower Profile per Material\n(absorber < 25th percentile X0 — narrower = higher Z / smaller Moliere radius)',
              fontsize=13, y=1.02)
 fig.tight_layout()
 save(fig, '6_lateral_profile.png')

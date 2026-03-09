@@ -47,7 +47,7 @@ Each calorimeter block records the total energy deposited per event. From the 16
 |---|---|
 | `Etotal` | Total energy deposited across all 16 blocks |
 | `CoreFraction` | Energy in central 2×2 blocks / total — measures compactness |
-| `ShowerWidth` | Energy-weighted RMS in x — measures lateral spread |
+| `ShowerWidth` | Energy-weighted 2D radial RMS — measures lateral spread (proxy for Molière radius) |
 
 ---
 
@@ -55,7 +55,7 @@ Each calorimeter block records the total energy deposited per event. From the 16
 
 - **GEANT4 11.x** with data packages
 - **CMake 3.16+**
-- **Python 3.8+** with `pandas`, `numpy`, `matplotlib` for analysis
+- **Python 3.8+** with `pandas`, `numpy`, `matplotlib`, `seaborn` for analysis
 
 
 
@@ -129,9 +129,14 @@ cd build
 ### Changing parameters via macro
 
 ```
+# Change material only (no /det/update needed — LV material updated directly)
 /det/setAbsorberMaterial G4_Pb
+
+# Change thickness (triggers automatic geometry rebuild internally)
 /det/setAbsorberThickness 20 mm
-/det/update
+
+# /det/update explicitly forces a full geometry rebuild — only needed if you
+# want to manually trigger a rebuild for another reason.
 /gun/energy 4 GeV
 /run/beamOn 2000
 ```
@@ -152,7 +157,9 @@ cd build
 Each run produces `shower_output.csv` in the build directory. Every row is one simulated event:
 
 ```
-event_id, material, absorber_thickness_mm, beam_energy_GeV,
+event_id, material, absorber_thickness_mm, absorber_x0,
+beam_energy_GeV, beam_px_MeVc, beam_py_MeVc, beam_pz_MeVc,
+vertex_x_mm, vertex_y_mm,
 E_block_0_GeV, ..., E_block_15_GeV,
 Etotal_GeV, CoreFraction, ShowerWidth_cm
 ```
@@ -160,14 +167,18 @@ Etotal_GeV, CoreFraction, ShowerWidth_cm
 ### Analyse results
 
 ```bash
-pip install pandas numpy matplotlib
+pip install pandas numpy matplotlib seaborn
 python analyse_shower.py shower_output.csv
 ```
 
-Produces three plots:
-- `etotal_by_material.png` — energy deposition distributions per material
-- `core_fraction_vs_thickness.png` — shower compactness as absorber thickness increases
-- `shower_heatmap.png` — mean energy in each of the 16 calorimeter blocks
+Produces 7 plots in the `plots/` directory:
+- `1_energy_resolution.png` — energy resolution σ/E vs beam energy per material
+- `2_shower_attenuation.png` — mean Etotal vs absorber thickness (X₀ units)
+- `3_core_fraction.png` — core fraction vs absorber thickness
+- `4_shower_width.png` — lateral shower width (2D radial RMS) vs absorber thickness
+- `5_block_energy_map.png` — mean energy heatmap for each of the 16 blocks
+- `6_lateral_profile.png` — normalised energy fraction per column, per material
+- `7_correlation_matrix.png` — Pearson correlation matrix of all observables
 
 ---
 
