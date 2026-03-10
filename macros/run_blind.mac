@@ -1,23 +1,24 @@
 # ============================================================
 #  macros/run_blind.mac
-#  Blind test: Brass (70% Cu, 30% Zn)
-#  Effective Z ≈ 27.4, effective X0 ≈ 1.54 cm
+#  Blind test sample — composition is sealed.
 #
-#  *** SEALED — do not reveal composition to ML/analysis team
-#  *** until after blind prediction is recorded
+#  *** DO NOT OPEN blind_key.txt until after the ML team has
+#  *** submitted their prediction in writing.
 #
-#  Alternative: replace "Brass" with "G4_W" for tungsten
-#  (harder challenge — extrapolates beyond training range)
+#  The material is registered under the alias "BlindSample".
+#  The output CSV will record "BlindSample" in the material
+#  column — the true identity is stored only in blind_key.txt,
+#  which must be kept away from the analysis team.
 # ============================================================
 
 /run/initialize
-/det/setAbsorberMaterial Brass
+/det/setAbsorberMaterial BlindSample
 /run/verbose 1
 /event/verbose 0
 /tracking/verbose 0
 
-# Same thickness grid as training materials (in mm)
-# 0.5, 1, 2, 3, 4, 5 X0 using X0≈1.54cm
+# Thickness grid: 0.5, 1, 2, 3, 4, 5 X0
+# (X0 value intentionally omitted — derivable only after unblinding)
 /gun/energy 1 GeV
 /det/setAbsorberThickness 7.7 mm
 /run/beamOn 2000

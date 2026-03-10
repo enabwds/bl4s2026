@@ -1,0 +1,18 @@
+============================================================
+  BL4S 2026 — BLIND TEST KEY
+  DO NOT share with the ML/analysis team before prediction.
+============================================================
+
+BlindSample = Brass (70% Cu, 30% Zn by mass)
+  Density    : 8.53 g/cm3
+  Effective Z: ~27.4
+  X0         : ~1.54 cm
+  RM         : ~1.57 cm
+
+Alternative harder blind: G4_W (Tungsten, Z=74, X0=0.35 cm)
+  To use: change BlindSample alias in DetectorConstruction.cc
+  DefineMaterials() from Brass to G4_W, rebuild, re-run.
+
+Thickness grid used (mm): 7.7, 15.4, 30.8, 46.2, 61.6, 77.0
+  (= 0.5, 1, 2, 3, 4, 5 X0 of Brass, rounded to 0.1 mm)
+============================================================

@@ -169,26 +169,10 @@ public:
         fGun->SetParticleMomentumDirection(dir);
         fGun->SetParticlePosition(G4ThreeVector(vx, vy, -191.*cm));
         fGun->GeneratePrimaryVertex(event);
-
-        // Store vertex and momentum for CSV output
-        fLastVx = vx/mm;
-        fLastVy = vy/mm;
-        fLastPx = ptot * dir.x() / (MeV);
-        fLastPy = ptot * dir.y() / (MeV);
-        fLastPz = ptot * dir.z() / (MeV);
     }
-
-    // Accessors for EventAction
-    double GetLastVx() const { return fLastVx; }
-    double GetLastVy() const { return fLastVy; }
-    double GetLastPx() const { return fLastPx; }
-    double GetLastPy() const { return fLastPy; }
-    double GetLastPz() const { return fLastPz; }
 
 private:
     G4ParticleGun* fGun;
-    double fLastVx=0, fLastVy=0;
-    double fLastPx=0, fLastPy=0, fLastPz=0;
 };
 
 // ============================================================

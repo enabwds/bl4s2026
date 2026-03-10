@@ -20,12 +20,37 @@
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
 #include "G4PhysListFactory.hh"  // FTFP_BERT_EMZ — precision EM shower physics
+#include "Randomize.hh"
 
 #include "DetectorConstruction.hh"
 #include "ActionInitialisation.hh"
 
+#include <cstdlib>
+#include <ctime>
+#include <string>
+
 int main(int argc, char** argv)
 {
+    // ── 0. Random seed ────────────────────────────────────────────────
+    // Usage: ./BL4S_sim [macro] [--seed N]
+    // If --seed N is provided the run is fully reproducible.
+    // If omitted, a time-based seed is used and printed so the run can
+    // be reproduced by passing that seed explicitly.
+    //
+    // Find and strip --seed from argv before passing to G4UIExecutive.
+    long seed = static_cast<long>(time(nullptr));
+    for (int i = 1; i < argc - 1; ++i) {
+        if (std::string(argv[i]) == "--seed") {
+            seed = std::atol(argv[i+1]);
+            // Shift remaining args down so GEANT4 never sees --seed
+            for (int j = i; j < argc - 2; ++j) argv[j] = argv[j+2];
+            argc -= 2;
+            break;
+        }
+    }
+    G4Random::setTheSeed(seed);
+    G4cout << "Random seed: " << seed
+           << "  (re-run with --seed " << seed << " to reproduce)\n";
     // ── 1. Create the run manager ──────────────────────────────────────
     // G4RunManagerFactory chooses Serial / MT automatically.
     auto* runManager =
@@ -48,9 +73,10 @@ int main(int argc, char** argv)
     runManager->SetUserInitialization(new ActionInitialisation());
 
     // ── 3. UI / Visualisation ─────────────────────────────────────────
-    G4VisManager* visManager = new G4VisExecutive();
-    visManager->Initialize();
-
+    // Visualisation is only initialised in interactive mode. In batch mode
+    // (argc > 1) this would waste startup time and fail on headless/HPC
+    // machines that have no display drivers.
+    G4VisManager* visManager = nullptr;
     G4UImanager* UI = G4UImanager::GetUIpointer();
 
     if (argc > 1) {
@@ -59,7 +85,9 @@ int main(int argc, char** argv)
         G4String fileName = argv[1];
         UI->ApplyCommand(command + fileName);
     } else {
-        // Interactive mode: open a UI session
+        // Interactive mode: initialise vis and open UI session
+        visManager = new G4VisExecutive();
+        visManager->Initialize();
         G4UIExecutive* ui = new G4UIExecutive(argc, argv);
         UI->ApplyCommand("/control/execute macros/vis.mac");
         ui->SessionStart();
@@ -67,7 +95,7 @@ int main(int argc, char** argv)
     }
 
     // ── 4. Clean up ───────────────────────────────────────────────────
-    delete visManager;
+    delete visManager;   // safe: delete nullptr is a no-op
     delete runManager;
     return 0;
 }

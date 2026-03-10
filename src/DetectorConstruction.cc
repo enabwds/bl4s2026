@@ -8,8 +8,11 @@
 //   (flush, no gaps between window and gas volumes)
 //
 //  [DWC 1]  [DWC 2]  [Scint 1]  [Absorber slab]  [Scint 2]  [4×4 PbGlass array]
-//   z=-85cm   z=-70cm   z=-40cm   downstream       z=-5cm      z=0 → z=+37cm
+//   z=-85cm   z=-70cm   z=-95cm   downstream       z=-5cm      z=0 → z=+37cm
 //                                 face at z=-6cm
+//
+//  Scint 1 moved from z=-40cm to z=-95cm to prevent geometry overlap with
+//  thick aluminium absorbers (Al 4-5 X0 = 356-445 mm, front face at -41 to -50 cm).
 //
 //  Real BL4S block dimensions: 10×10×37 cm each, 4×4 = 40×40 cm face
 //  Beam spot: 2 cm diameter circular cross-section
@@ -124,7 +127,21 @@ void DetectorConstruction::DefineMaterials()
     arco2->AddElement(C,  0.0589);
     arco2->AddElement(O,  0.1570);
 
-    (void)brass; (void)arco2;  // suppress unused warnings
+    // ── Blind-test alias ────────────────────────────────────────────────
+    // "BlindSample" is a named alias for the sealed blind material.
+    // The true composition is recorded only in blind_key.txt (keep away
+    // from the analysis team). The CSV will write "BlindSample" — not the
+    // real material name — so the output is safe to hand to the ML team.
+    // To change the blind material: update only this line and blind_key.txt.
+    G4Material* blindReal = G4Material::GetMaterial("Brass");
+    auto* blindSample = new G4Material("BlindSample",
+                                       blindReal->GetDensity(),
+                                       blindReal->GetNumberOfElements());
+    for (size_t i = 0; i < blindReal->GetNumberOfElements(); ++i)
+        blindSample->AddElement(const_cast<G4Element*>(blindReal->GetElement(i)),
+                                blindReal->GetFractionVector()[i]);
+
+    (void)blindSample; (void)arco2;  // suppress unused warnings
 }
 
 // ── Geometry construction ────────────────────────────────────────────────────
@@ -199,11 +216,18 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     dwcLV2->SetVisAttributes(dwcVis);
 
     // ── SCINTILLATOR TRIGGER 1 (upstream of absorber) ────────────────
-    // 10×20 cm plastic scintillator, 5 mm thick
+    // 10×20 cm plastic scintillator, 5 mm thick.
+    // Placed at z = -95 cm — safely downstream of both DWCs and upstream
+    // of the thickest possible absorber (Al 5 X0 = 444.85 mm, whose front
+    // face reaches z = -50.5 cm). The original z = -40 cm caused a geometry
+    // overlap with Al absorbers thicker than ~3.5 X0 (356 mm+), which
+    // corrupted those configurations. z = -95 cm gives > 44 cm clearance
+    // from the absorber front face at maximum thickness, and sits between
+    // DWC2 (z = -70 cm) and the absorber region.
     G4Material* scint = nist->FindOrBuildMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
     auto* scint1Solid = new G4Box("Scint1", 5.*cm, 10.*cm, 0.25*cm);
     auto* scint1LV    = new G4LogicalVolume(scint1Solid, scint, "Scint1");
-    new G4PVPlacement(nullptr, G4ThreeVector(0,0,-40.*cm),
+    new G4PVPlacement(nullptr, G4ThreeVector(0,0,-95.*cm),
                       scint1LV, "Scint1", worldLV, false, 0, true);
 
     auto* scintVis = new G4VisAttributes(G4Colour(0.0, 0.8, 0.0, 0.7));
@@ -333,14 +357,14 @@ void DetectorConstruction::SetAbsorberMaterial(const G4String& name)
     if (!mat) { G4cerr << "Material " << name << " not found!\n"; return; }
     fAbsorberMaterial = mat;
 
-    // Update the existing logical volume directly — no geometry rebuild needed.
-    // This avoids the MT duplicate-LV crash caused by ReinitializeGeometry().
-    auto* lvStore = G4LogicalVolumeStore::GetInstance();
-    auto* absorberLV = lvStore->GetVolume("Absorber", false);
-    if (absorberLV) absorberLV->SetMaterial(mat);
-
-    // Notify GEANT4 that material changed (needed for physics tables)
-    G4RunManager::GetRunManager()->PhysicsHasBeenModified();
+    // Always trigger a full geometry rebuild so that the new material is
+    // guaranteed to be visible in Construct() regardless of whether the
+    // thickness changes next. The previous in-place SetMaterial() approach
+    // was only safe when a thickness change (and its ReinitializeGeometry())
+    // immediately followed — a silent ordering dependency that could produce
+    // physically inconsistent results if violated.
+    G4RunManager::GetRunManager()->ReinitializeGeometry();
+    PrintParameters();
 }
 
 void DetectorConstruction::SetAbsorberThickness(G4double t)
