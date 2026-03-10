@@ -37,7 +37,7 @@ namespace CsvOutput {
     std::mutex    mtx;
 
     void open(const std::string& fname) {
-        if (file.is_open()) return;   // already open from a previous run — don't truncate
+        if (file.is_open()) return;   // already open (e.g. called twice on same run)
         bool needHeader = false;
         {
             std::ifstream probe(fname, std::ios::ate);
@@ -64,6 +64,7 @@ namespace CsvOutput {
                double Etot, double core, double width)
     {
         std::lock_guard<std::mutex> lock(mtx);
+        // Metadata columns: use fixed 4dp for thickness/X0/energy values
         file << eventID << ","
              << material << ","
              << std::fixed << std::setprecision(4)
@@ -72,11 +73,17 @@ namespace CsvOutput {
              << beamGeV  << ","
              << px << "," << py << "," << pz << ","
              << vx << "," << vy << ",";
+        // Block energies: restore defaultfloat so small values retain
+        // significant figures (e.g. 1.23e-4 GeV rather than 0.0001).
+        file << std::defaultfloat << std::setprecision(6);
         for (double e : E) file << e << ",";
         file << Etot << "," << core << "," << width << "\n";
+        // Flush after every event so data is not lost on crash or SIGINT.
+        // On modern OS this costs ~1 syscall but protects against partial runs.
+        file.flush();
     }
 
-    void close() { file.close(); }
+    void close() { if (file.is_open()) file.close(); }
 }
 
 // ============================================================
@@ -91,7 +98,7 @@ namespace CsvOutput {
 //  Energies      : 1, 2, 4 GeV (set via /gun/energy macro command)
 //
 //  Momentum spread: ±0.15 GeV/c, Gaussian (fixed by beamline optics)
-//                   σ_p = 0.15/2.35 GeV/c (FWHM → sigma conversion)
+//                   sigma_p = 0.15/2.3548 GeV/c (FWHM to sigma conversion)
 //
 //  Beam spot     : 2 cm diameter circular cross-section at focal point
 //                  Modelled as uniform disk (conservative)
@@ -113,7 +120,10 @@ public:
         fGun->SetParticleDefinition(table->FindParticle("e-"));
         fGun->SetParticleEnergy(2.0 * GeV);
         fGun->SetParticleMomentumDirection(G4ThreeVector(0, 0, 1));
-        fGun->SetParticlePosition(G4ThreeVector(0, 0, -190.*cm));
+        // Position 1 cm upstream of ChkvWindow1 front face (z=-190 cm).
+        // Placing the gun exactly on a volume boundary is ambiguous in GEANT4 —
+        // the primary vertex must be in free air to guarantee a clean first step.
+        fGun->SetParticlePosition(G4ThreeVector(0, 0, -191.*cm));
     }
 
     ~PrimaryGeneratorAction() override { delete fGun; }
@@ -123,13 +133,13 @@ public:
         // ── Nominal beam energy ───────────────────────────────────────
         G4double E0 = fGun->GetParticleEnergy();
         G4double m  = fGun->GetParticleDefinition()->GetPDGMass();
-        G4double p0 = std::sqrt(E0*(E0 + 2*m));  // nominal momentum
+        G4double p0 = std::sqrt(E0*(E0 + 2*m));  // nominal total momentum
 
-        // ── Momentum spread: σ_p = 0.15 GeV/c / 2.355 (FWHM→σ) ─────
-        // The beamline optics fix Δp/p ~ ±0.15 GeV/c FWHM
-        G4double sigmaP = (0.15*GeV) / 2.355;
-        G4double pz     = G4RandGauss::shoot(p0, sigmaP);
-        pz = std::max(pz, 0.1*GeV);  // prevent negative momentum
+        // ── Momentum spread: σ_p = FWHM/2.3548, FWHM = 0.15 GeV/c ──
+        // Generate the smeared total momentum magnitude directly.
+        G4double sigmaP = (0.15*GeV) / 2.3548;
+        G4double ptot   = G4RandGauss::shoot(p0, sigmaP);
+        ptot = std::max(ptot, 0.1*GeV);  // prevent non-physical negative values
 
         // ── Beam divergence: σ_angle = 0.5 mrad ─────────────────────
         // ~1 mrad total divergence (unconfirmed — update when confirmed)
@@ -137,9 +147,13 @@ public:
         G4double theta_x = G4RandGauss::shoot(0., sigmaTh);
         G4double theta_y = G4RandGauss::shoot(0., sigmaTh);
 
-        G4double ptot = pz / std::cos(std::sqrt(theta_x*theta_x + theta_y*theta_y));
+        // Decompose ptot into (px, py, pz) using small-angle approximation.
+        // For small angles: px = ptot*sin(theta_x) ≈ ptot*theta_x,
+        //                   py = ptot*sin(theta_y) ≈ ptot*theta_y,
+        //                   pz = ptot*cos(theta_total)
+        G4double theta_tot = std::sqrt(theta_x*theta_x + theta_y*theta_y);
         G4ThreeVector dir(std::sin(theta_x), std::sin(theta_y),
-                          std::cos(std::sqrt(theta_x*theta_x + theta_y*theta_y)));
+                          std::cos(theta_tot));
         dir = dir.unit();
 
         // ── Beam spot: uniform disk, 2 cm diameter ────────────────────
@@ -153,7 +167,7 @@ public:
 
         fGun->SetParticleEnergy(Esmeared);
         fGun->SetParticleMomentumDirection(dir);
-        fGun->SetParticlePosition(G4ThreeVector(vx, vy, -190.*cm));
+        fGun->SetParticlePosition(G4ThreeVector(vx, vy, -191.*cm));
         fGun->GeneratePrimaryVertex(event);
 
         // Store vertex and momentum for CSV output
@@ -194,7 +208,7 @@ public:
 
     void EndOfRunAction(const G4Run* run) override {
         if (isMaster) {
-            CsvOutput::file.flush();   // flush to disk; keep file open for next run
+            CsvOutput::close();   // flush and close; file will be re-opened on next run
             G4cout << "Run complete. Events: " << run->GetNumberOfEvent() << "\n";
         }
     }
@@ -217,6 +231,15 @@ public:
 //    Events > 3.5σ from running mean are anomalous secondaries
 //    (e.g. back-scatter, δ-rays reaching detector from upstream).
 //    Welford online algorithm: O(1) memory, numerically stable.
+//
+//  THREAD SAFETY NOTE:
+//    NoiseFilter is a member of EventAction, which is instantiated
+//    per worker thread by ActionInitialisation::Build(). Each worker
+//    therefore owns its own filter instance — no shared state.
+//    fLastMaterial and fLastThickness are likewise per-worker, so
+//    the configuration-change reset is safe in MT mode provided each
+//    worker sees a consistent view of detector parameters (guaranteed
+//    because ReinitializeGeometry() completes before any new run begins).
 // ============================================================
 struct NoiseFilter
 {
@@ -243,8 +266,22 @@ struct NoiseFilter
     double stddev() const { return (n > 1) ? std::sqrt(M2/(n-1)) : 0.; }
 
     bool accept(double Etot, double beamGeV) {
+        // Cut 2: beam-miss rejection — always applied regardless of warm-up state.
         if (Etot < kMinFraction * beamGeV) return false;
-        if (n >= 10) {
+
+        // Cut 3: outlier rejection via Welford running statistics.
+        // WARM-UP NOTE: the outlier cut only activates after kWarmup accepted
+        // events have been collected. During warm-up all events passing cut 2
+        // are accepted unconditionally and used to seed the mean/variance.
+        // This means up to kWarmup abnormal events at the START of each
+        // configuration (after a filter Reset()) can bias the running mean.
+        // The reset happens on every configuration change (~72 times in a full
+        // material scan) so this window re-opens frequently.
+        // Mitigation: kWarmup is kept small (10) so the bias decays quickly;
+        // the 3.5-sigma cut is wide enough to tolerate a slightly biased mean
+        // for the first few post-warmup events.
+        static constexpr long kWarmup = 10;
+        if (n >= kWarmup) {
             double s = stddev();
             if (s > 0. && std::abs(Etot - mean) > kOutlierSigma * s)
                 return false;
@@ -292,8 +329,10 @@ public:
         auto* det = static_cast<const DetectorConstruction*>(
             G4RunManager::GetRunManager()->GetUserDetectorConstruction());
         std::string material    = det->GetAbsorberMaterial()->GetName();
-        double      thickMM     = det->GetAbsorberThickness();
-        double      thickX0     = (thickMM * mm) /
+        // GetAbsorberThickness() now returns G4 internal units — divide by mm
+        // to get the numeric mm value for CSV, and use raw value for X0 ratio.
+        double      thickMM     = det->GetAbsorberThickness() / mm;
+        double      thickX0     = det->GetAbsorberThickness() /
                                    det->GetAbsorberMaterial()->GetRadlen();
 
         // ── Reset noise filter on configuration change ────────────────
@@ -317,12 +356,13 @@ public:
         double Ecore        = E[5] + E[6] + E[9] + E[10];
         double coreFraction = (Etot > 0.) ? Ecore / Etot : 0.;
 
-        // Lateral width: 2D energy-weighted radial RMS from array centre
+        // Lateral width: 2D energy-weighted radial RMS from array centre.
         // Block centres (cm): col/row 0=-15, 1=-5, 2=+5, 3=+15
-        // Using radial RMS from origin (standard Moliere radius proxy used
-        // in real calorimeter analyses). The beam is well-centred so the
-        // mean position is near zero — no mean subtraction needed.
-        // This captures the full 2D lateral profile, not just the X axis.
+        // Computes the full 2D radial RMS sqrt(sum(w*(x^2+y^2))/sum(w)),
+        // which is a proxy for the Moliere radius. This is NOT a 1D width
+        // in x only — both transverse dimensions are included.
+        // The beam is well-centred so the mean position is near zero —
+        // no mean subtraction is needed for a centred shower.
         static const double xCentre[4] = {-15., -5.,  5., 15.};
         static const double yCentre[4] = {-15., -5.,  5., 15.};
         double sumW=0., sumWr2=0.;

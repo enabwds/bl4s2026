@@ -38,11 +38,11 @@ density_map = {          # g/cm³ — useful for later analysis
     'Brass': 8.5,     # typical brass density
 }
 
-critical_energy_map = {  # MeV — energy where ionisation = radiation loss
+critical_energy_map = {  # MeV — electron critical energy (PDG 2023)
     'G4_Al': 42.3,
     'G4_Fe': 21.2,
     'G4_Cu': 19.0,
-    'G4_Pb':  6.71,
+    'G4_Pb':  7.43,  # corrected from 6.71 (PDG 2023 electron value)
     'Brass': 19.2,    # interpolated between Cu and Zn
 }
 
@@ -82,14 +82,21 @@ df['Ec_MeV']             = df['material'].map(critical_energy_map)
 df['moliere_radius_cm']  = df['material'].map(moliere_radius_map)
 df['thickness_cm']       = df['absorber_thickness_mm'] / 10.0
 
-# Sanity check: recompute absorber_x0 and compare to GEANT4's value
+# Sanity check: recompute absorber_x0 and compare to GEANT4's value.
+# NOTE: absorber_x0 in the CSV uses GEANT4's internal Tsai-formula X0,
+# which can differ slightly from the PDG table values in X0_map above
+# (e.g. G4 NIST X0 for Fe = 1.7588 cm vs PDG 1.757 cm, ~0.1% difference).
+# The tolerance of 0.01 accommodates this systematic offset.
+# For custom materials (LeadGlass, Brass), absorber_x0 will not appear
+# in this CSV unless those materials are used as absorbers — the check
+# will trivially pass (no rows) and should not be read as validation.
 df['X0_check'] = df['thickness_cm'] / df['X0_cm']
 discrepancy = (df['X0_check'] - df['absorber_x0']).abs().max()
 print(f"\nSanity check — max discrepancy between recomputed and G4 absorber_x0: {discrepancy:.6f}")
 if discrepancy < 0.01:
-    print("  ✓ Consistent — X0 values are correct")
+    print("  OK — within tolerance (G4 Tsai X0 vs PDG table values differ by ~0.1%)")
 else:
-    print("  ✗ Large discrepancy — check X0 values in the map above")
+    print("  FAIL — large discrepancy; check X0 values in the map above")
 
 # Drop the check column (optional — remove this line to keep it)
 df.drop(columns=['X0_check'], inplace=True)
