@@ -1,0 +1,172 @@
+# ============================================================
+#  macros/run_extended_materials.mac
+#  Extended material scan: Tin (Sn), Tungsten (W), Titanium (Ti)
+#  Same protocol as run_material_scan.mac:
+#    6 thicknesses × 3 energies × 2000 events = 36,000 events/material
+#
+#  These materials fill the Z gap between training materials:
+#    Ti  Z=22  X0=3.560 cm  — sits between Al(13) and Fe(26)
+#    Sn  Z=50  X0=1.206 cm  — sits between Cu(29) and Pb(82)
+#    W   Z=74  X0=0.350 cm  — sits between Pb(82) and extrapolation region
+#
+#  IMPORTANT: Before running, add these materials to DefineMaterials()
+#  in DetectorConstruction.cc — see comments in that file.
+#  Tin and Titanium are not in the GEANT4 NIST list by these names;
+#  use G4_Sn, G4_W, G4_Ti (NIST standard names).
+# ============================================================
+
+/run/initialize
+/run/verbose 1
+/event/verbose 0
+/tracking/verbose 0
+
+# ════════════════════════════════════════════════
+#  TITANIUM  (Z=22, X0=3.560 cm, Ec=28.1 MeV)
+#  Sits between Al and Fe — useful interpolation point
+#  Thicknesses: 0.5, 1, 2, 3, 4, 5 X0
+#    = 17.8, 35.6, 71.2, 106.8, 142.4, 178.0 mm
+# ════════════════════════════════════════════════
+/det/setAbsorberMaterial G4_Ti
+
+/gun/energy 1 GeV
+/det/setAbsorberThickness 17.8 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 35.6 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 71.2 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 106.8 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 142.4 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 178.0 mm
+/run/beamOn 2000
+
+/gun/energy 2 GeV
+/det/setAbsorberThickness 17.8 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 35.6 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 71.2 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 106.8 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 142.4 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 178.0 mm
+/run/beamOn 2000
+
+/gun/energy 4 GeV
+/det/setAbsorberThickness 17.8 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 35.6 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 71.2 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 106.8 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 142.4 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 178.0 mm
+/run/beamOn 2000
+
+# ════════════════════════════════════════════════
+#  TIN  (Z=50, X0=1.206 cm, Ec=12.7 MeV)
+#  Sits between Cu and Pb — largest Z gap in training set
+#  Thicknesses: 0.5, 1, 2, 3, 4, 5 X0
+#    = 6.03, 12.06, 24.12, 36.18, 48.24, 60.30 mm
+# ════════════════════════════════════════════════
+/det/setAbsorberMaterial G4_Sn
+
+/gun/energy 1 GeV
+/det/setAbsorberThickness 6.03 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 12.06 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 24.12 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 36.18 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 48.24 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 60.30 mm
+/run/beamOn 2000
+
+/gun/energy 2 GeV
+/det/setAbsorberThickness 6.03 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 12.06 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 24.12 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 36.18 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 48.24 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 60.30 mm
+/run/beamOn 2000
+
+/gun/energy 4 GeV
+/det/setAbsorberThickness 6.03 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 12.06 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 24.12 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 36.18 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 48.24 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 60.30 mm
+/run/beamOn 2000
+
+# ════════════════════════════════════════════════
+#  TUNGSTEN  (Z=74, X0=0.350 cm, Ec=8.0 MeV)
+#  Just below Pb in Z — very compact showers
+#  Already defined as G4_W in DefineMaterials()
+#  Thicknesses: 0.5, 1, 2, 3, 4, 5 X0
+#    = 1.75, 3.50, 7.00, 10.50, 14.00, 17.50 mm
+# ════════════════════════════════════════════════
+/det/setAbsorberMaterial G4_W
+
+/gun/energy 1 GeV
+/det/setAbsorberThickness 1.75 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 3.50 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 7.00 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 10.50 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 14.00 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 17.50 mm
+/run/beamOn 2000
+
+/gun/energy 2 GeV
+/det/setAbsorberThickness 1.75 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 3.50 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 7.00 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 10.50 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 14.00 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 17.50 mm
+/run/beamOn 2000
+
+/gun/energy 4 GeV
+/det/setAbsorberThickness 1.75 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 3.50 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 7.00 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 10.50 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 14.00 mm
+/run/beamOn 2000
+/det/setAbsorberThickness 17.50 mm
+/run/beamOn 2000

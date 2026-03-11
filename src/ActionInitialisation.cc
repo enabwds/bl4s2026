@@ -340,23 +340,36 @@ public:
         double Ecore        = E[5] + E[6] + E[9] + E[10];
         double coreFraction = (Etot > 0.) ? Ecore / Etot : 0.;
 
-        // Lateral width: 2D energy-weighted radial RMS from array centre.
+        // Lateral width: 2D energy-weighted radial RMS around the shower centroid.
         // Block centres (cm): col/row 0=-15, 1=-5, 2=+5, 3=+15
-        // Computes the full 2D radial RMS sqrt(sum(w*(x^2+y^2))/sum(w)),
-        // which is a proxy for the Moliere radius. This is NOT a 1D width
-        // in x only — both transverse dimensions are included.
-        // The beam is well-centred so the mean position is near zero —
-        // no mean subtraction is needed for a centred shower.
+        //
+        // We first compute the energy-weighted centroid (xbar, ybar), then compute
+        // the RMS of distances from that centroid — not from the array centre.
+        // This removes the bias introduced by beam position jitter: a beam displaced
+        // 1 cm from centre shifts the shower centroid by ~1 cm, which would otherwise
+        // add ~1 cm in quadrature to the measured width, inflating it by 10-25%
+        // relative to the true intrinsic shower width.
         static const double xCentre[4] = {-15., -5.,  5., 15.};
         static const double yCentre[4] = {-15., -5.,  5., 15.};
-        double sumW=0., sumWr2=0.;
+        double sumW=0., sumWx=0., sumWy=0.;
         for (int row = 0; row < 4; ++row) {
             for (int col = 0; col < 4; ++col) {
                 double w = E[row*4 + col];
-                double x = xCentre[col];
-                double y = yCentre[row];
-                sumW   += w;
-                sumWr2 += w*(x*x + y*y);
+                sumW  += w;
+                sumWx += w * xCentre[col];
+                sumWy += w * yCentre[row];
+            }
+        }
+        double xbar = (sumW > 0.) ? sumWx / sumW : 0.;
+        double ybar = (sumW > 0.) ? sumWy / sumW : 0.;
+
+        double sumWr2 = 0.;
+        for (int row = 0; row < 4; ++row) {
+            for (int col = 0; col < 4; ++col) {
+                double w  = E[row*4 + col];
+                double dx = xCentre[col] - xbar;
+                double dy = yCentre[row] - ybar;
+                sumWr2 += w * (dx*dx + dy*dy);
             }
         }
         double width = (sumW > 0.) ? std::sqrt(sumWr2 / sumW) : 0.;
