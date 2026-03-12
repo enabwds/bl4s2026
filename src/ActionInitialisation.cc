@@ -316,7 +316,11 @@ public:
         // GetAbsorberThickness() now returns G4 internal units — divide by mm
         // to get the numeric mm value for CSV, and use raw value for X0 ratio.
         double      thickMM     = det->GetAbsorberThickness() / mm;
-        double      thickX0     = det->GetAbsorberThickness() /
+        // For the blind sample, write 0.0 for absorber_x0 so the CSV does not
+        // leak the true radiation length (and hence the material identity) to
+        // anyone inspecting the raw data before unblinding.
+        double      thickX0     = (material == "BlindSample") ? 0.0 :
+                                   det->GetAbsorberThickness() /
                                    det->GetAbsorberMaterial()->GetRadlen();
 
         // ── Reset noise filter on configuration change ────────────────

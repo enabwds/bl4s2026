@@ -20,6 +20,8 @@ X0_map = {
     'G4_Cu': 1.436,   # cm
     'G4_Pb': 0.5612,  # cm
     'Brass': 1.54,    # cm (70% Cu, 30% Zn) — add after unblinding run_blind.mac
+    # BlindSample deliberately left as NaN — do not add true value here
+    # until after the ML team has submitted their prediction.
 }
 
 Z_map = {
@@ -87,19 +89,20 @@ df['thickness_cm']       = df['absorber_thickness_mm'] / 10.0
 # which can differ slightly from the PDG table values in X0_map above
 # (e.g. G4 NIST X0 for Fe = 1.7588 cm vs PDG 1.757 cm, ~0.1% difference).
 # The tolerance of 0.01 accommodates this systematic offset.
-# For custom materials (LeadGlass, Brass), absorber_x0 will not appear
-# in this CSV unless those materials are used as absorbers — the check
-# will trivially pass (no rows) and should not be read as validation.
-df['X0_check'] = df['thickness_cm'] / df['X0_cm']
-discrepancy = (df['X0_check'] - df['absorber_x0']).abs().max()
-print(f"\nSanity check — max discrepancy between recomputed and G4 absorber_x0: {discrepancy:.6f}")
-if discrepancy < 0.01:
-    print("  OK — within tolerance (G4 Tsai X0 vs PDG table values differ by ~0.1%)")
+# BlindSample rows are excluded — absorber_x0 is intentionally 0.0 for those
+# rows (written that way in ActionInitialisation.cc) to prevent the ML team
+# from back-calculating X0 and inferring the material before unblinding.
+df_check = df[df['material'] != 'BlindSample'].copy()
+if len(df_check) > 0:
+    df_check['X0_check'] = df_check['thickness_cm'] / df_check['X0_cm']
+    discrepancy = (df_check['X0_check'] - df_check['absorber_x0']).abs().max()
+    print(f"\nSanity check — max discrepancy between recomputed and G4 absorber_x0: {discrepancy:.6f}")
+    if discrepancy < 0.01:
+        print("  OK — within tolerance (G4 Tsai X0 vs PDG table values differ by ~0.1%)")
+    else:
+        print("  FAIL — large discrepancy; check X0 values in the map above")
 else:
-    print("  FAIL — large discrepancy; check X0 values in the map above")
-
-# Drop the check column (optional — remove this line to keep it)
-df.drop(columns=['X0_check'], inplace=True)
+    print("\nSanity check skipped — CSV contains only BlindSample rows.")
 
 # ── Save ───────────────────────────────────────────────────────────────────
 df.to_csv(output_file, index=False)
