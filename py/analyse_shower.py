@@ -24,12 +24,24 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # ── Material properties ───────────────────────────────────────────────────────
-X0_map  = {'G4_Al': 8.897, 'G4_Fe': 1.757, 'G4_Cu': 1.436, 'G4_Pb': 0.5612}
-Z_map   = {'G4_Al': 13,    'G4_Fe': 26,    'G4_Cu': 29,    'G4_Pb': 82}
-COLOURS = {'G4_Al': '#4C9BE8', 'G4_Fe': '#E8834C',
-           'G4_Cu': '#B05CE8', 'G4_Pb': '#4CE87A'}
-LABELS  = {'G4_Al': 'Aluminium (Z=13)', 'G4_Fe': 'Iron (Z=26)',
-           'G4_Cu': 'Copper (Z=29)',    'G4_Pb': 'Lead (Z=82)'}
+X0_map  = {
+    'G4_Al': 8.897, 'G4_Ti': 3.560, 'G4_Fe': 1.757,
+    'G4_Cu': 1.436, 'G4_Sn': 1.210, 'G4_W':  0.350, 'G4_Pb': 0.5612
+}
+Z_map   = {
+    'G4_Al': 13, 'G4_Ti': 22, 'G4_Fe': 26,
+    'G4_Cu': 29, 'G4_Sn': 50, 'G4_W':  74, 'G4_Pb': 82
+}
+COLOURS = {
+    'G4_Al': '#4C9BE8', 'G4_Ti': '#E84C4C', 'G4_Fe': '#E8834C',
+    'G4_Cu': '#B05CE8', 'G4_Sn': '#4CE8B0', 'G4_W':  '#E8D84C', 'G4_Pb': '#4CE87A'
+}
+LABELS  = {
+    'G4_Al': 'Aluminium (Z=13)', 'G4_Ti': 'Titanium (Z=22)',
+    'G4_Fe': 'Iron (Z=26)',      'G4_Cu': 'Copper (Z=29)',
+    'G4_Sn': 'Tin (Z=50)',       'G4_W':  'Tungsten (Z=74)',
+    'G4_Pb': 'Lead (Z=82)'
+}
 BLOCK_COLS = [f'E_block_{i}_GeV' for i in range(16)]
 
 # ── Argument parsing ──────────────────────────────────────────────────────────
