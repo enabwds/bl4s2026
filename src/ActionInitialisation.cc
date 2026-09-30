@@ -1,413 +1,594 @@
-// ============================================================
-//  ActionInitialisation.cc
-//  Defines PrimaryGeneratorAction, RunAction, EventAction,
-//  and NoiseFilter — all in one file for student readability.
-// ============================================================
-
 #include "ActionInitialisation.hh"
-#include "CalorimeterSD.hh"
-#include "DetectorConstruction.hh"
 
-#include "G4VUserPrimaryGeneratorAction.hh"
+#include "DetectorConstruction.hh"
+#include "CalorimeterSD.hh"
+
+// GEANT4 action classes
 #include "G4UserRunAction.hh"
 #include "G4UserEventAction.hh"
+#include "G4VUserPrimaryGeneratorAction.hh"
+
+// GEANT4 basics
+#include "G4Event.hh"
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
 #include "G4SystemOfUnits.hh"
-#include "G4PhysicalConstants.hh"
+#include "G4ThreeVector.hh"
 #include "G4Run.hh"
-#include "G4Event.hh"
 #include "G4SDManager.hh"
-#include "G4HCofThisEvent.hh"
+#include "G4THitsCollection.hh"
 #include "G4RunManager.hh"
-#include "G4ios.hh"
 #include "Randomize.hh"
 
-#include <array>
-#include <cmath>
+// Standard C++
 #include <fstream>
 #include <iomanip>
+#include <string>
+#include <vector>
 #include <mutex>
+#include <cmath>
+#include <algorithm>
 
 // ============================================================
-//  CSV OUTPUT
+// Configuration
 // ============================================================
-namespace CsvOutput {
-    std::ofstream file;
-    std::mutex    mtx;
 
-    void open(const std::string& fname) {
-        if (file.is_open()) return;   // already open (e.g. called twice on same run)
-        bool needHeader = false;
-        {
-            std::ifstream probe(fname, std::ios::ate);
-            needHeader = (!probe.is_open() || probe.tellg() == 0);
-        }
-        file.open(fname, std::ios::app);   // APPEND — never truncates existing data
-        if (needHeader) {
-            file << "event_id,material,absorber_thickness_mm,absorber_x0,"
-                 << "beam_energy_GeV,beam_px_MeVc,beam_py_MeVc,beam_pz_MeVc,"
-                 << "vertex_x_mm,vertex_y_mm,";
-            for (int i = 0; i < 16; ++i)
-                file << "E_block_" << i << "_GeV,";
-            file << "Etotal_GeV,CoreFraction,ShowerWidth_cm\n";
-        }
-    }
+namespace SimulationConfig
+{
+    constexpr G4double kBeamMomentumSpreadFWHM = 0.15 * GeV;
+    constexpr G4double kBeamAngularSigma = 0.5 * mrad;
+    constexpr G4double kBeamSpotRadius = 1.0 * cm;
 
-    void write(long eventID,
-               const std::string& material,
-               double thickMM, double thickX0,
-               double beamGeV,
-               double px, double py, double pz,
-               double vx, double vy,
-               const std::array<double,16>& E,
-               double Etot, double core, double width)
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        // Metadata columns: use fixed 4dp for thickness/X0/energy values
-        file << eventID << ","
-             << material << ","
-             << std::fixed << std::setprecision(4)
-             << thickMM  << ","
-             << thickX0  << ","
-             << beamGeV  << ","
-             << px << "," << py << "," << pz << ","
-             << vx << "," << vy << ",";
-        // Block energies: restore defaultfloat so small values retain
-        // significant figures (e.g. 1.23e-4 GeV rather than 0.0001).
-        file << std::defaultfloat << std::setprecision(6);
-        for (double e : E) file << e << ",";
-        file << Etot << "," << core << "," << width << "\n";
-        // Flush after every event so data is not lost on crash or SIGINT.
-        // On modern OS this costs ~1 syscall but protects against partial runs.
-        file.flush();
-    }
+    constexpr G4double kBeamVertexZ = -191.0 * cm;
 
-    void close() { if (file.is_open()) file.close(); }
+    constexpr G4int kNumberOfCalorimeterBlocks = 16;
 }
 
 // ============================================================
-//  PRIMARY GENERATOR
-//
-//  Models the real BL4S PS beamline (T9/H4):
-//
-//  Beam species  : electrons (e-), >90% purity below 3 GeV
-//                  (Cherenkov detectors confirm purity in simulation
-//                   — here we just shoot pure electrons)
-//
-//  Energies      : 1, 2, 4 GeV (set via /gun/energy macro command)
-//
-//  Momentum spread: ±0.15 GeV/c, Gaussian (fixed by beamline optics)
-//                   sigma_p = 0.15/2.3548 GeV/c (FWHM to sigma conversion)
-//
-//  Beam spot     : 2 cm diameter circular cross-section at focal point
-//                  Modelled as uniform disk (conservative)
-//
-//  Divergence    : ~1 mrad (unconfirmed — check with BL4S team)
-//                  Modelled as Gaussian angular spread σ = 0.5 mrad
-//
-//  Particles/spill: 10^4 to 10^5 (tunable via collimator)
-//  DAQ rate limit : 3000 particles/second
-//  Spill duration : ~400 ms  →  max ~1200 particles per spill at DAQ limit
+// Primary Generator
 // ============================================================
+
 class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
 public:
+
     PrimaryGeneratorAction()
     {
-        fGun = new G4ParticleGun(1);
-        auto* table = G4ParticleTable::GetParticleTable();
-        fGun->SetParticleDefinition(table->FindParticle("e-"));
-        fGun->SetParticleEnergy(2.0 * GeV);
-        fGun->SetParticleMomentumDirection(G4ThreeVector(0, 0, 1));
-        // Position 1 cm upstream of ChkvWindow1 front face (z=-190 cm).
-        // Placing the gun exactly on a volume boundary is ambiguous in GEANT4 —
-        // the primary vertex must be in free air to guarantee a clean first step.
-        fGun->SetParticlePosition(G4ThreeVector(0, 0, -191.*cm));
+        fParticleGun = new G4ParticleGun(1);
+
+        auto* particleTable = G4ParticleTable::GetParticleTable();
+        auto* electron = particleTable->FindParticle("e-");
+
+        fParticleGun->SetParticleDefinition(electron);
+        fParticleGun->SetParticleEnergy(2.0 * GeV);
+        fParticleGun->SetParticlePosition(
+            G4ThreeVector(0.0, 0.0, SimulationConfig::kBeamVertexZ)
+        );
     }
 
-    ~PrimaryGeneratorAction() override { delete fGun; }
+    ~PrimaryGeneratorAction() override
+    {
+        delete fParticleGun;
+    }
 
     void GeneratePrimaries(G4Event* event) override
     {
-        // ── Nominal beam energy ───────────────────────────────────────
-        G4double E0 = fGun->GetParticleEnergy();
-        G4double m  = fGun->GetParticleDefinition()->GetPDGMass();
-        G4double p0 = std::sqrt(E0*(E0 + 2*m));  // nominal total momentum
+        const G4double nominalEnergy =
+            fParticleGun->GetParticleEnergy();
 
-        // ── Momentum spread: σ_p = FWHM/2.3548, FWHM = 0.15 GeV/c ──
-        // Generate the smeared total momentum magnitude directly.
-        G4double sigmaP = (0.15*GeV) / 2.3548;
-        G4double ptot   = G4RandGauss::shoot(p0, sigmaP);
-        ptot = std::max(ptot, 0.1*GeV);  // prevent non-physical negative values
+        // ----------------------------------------------------
+        // Beam momentum spread
+        //
+        // The supplied beam spread is interpreted as FWHM.
+        // Convert FWHM -> Gaussian sigma.
+        // ----------------------------------------------------
 
-        // ── Beam divergence: σ_angle = 0.5 mrad ─────────────────────
-        // ~1 mrad total divergence (unconfirmed — update when confirmed)
-        G4double sigmaTh = 0.5e-3;  // rad
-        G4double theta_x = G4RandGauss::shoot(0., sigmaTh);
-        G4double theta_y = G4RandGauss::shoot(0., sigmaTh);
+        const G4double sigmaP =
+            SimulationConfig::kBeamMomentumSpreadFWHM / 2.354820045;
 
-        // Decompose ptot into (px, py, pz) using small-angle approximation.
-        // For small angles: px = ptot*sin(theta_x) ≈ ptot*theta_x,
-        //                   py = ptot*sin(theta_y) ≈ ptot*theta_y,
-        //                   pz = ptot*cos(theta_total)
-        G4double theta_tot = std::sqrt(theta_x*theta_x + theta_y*theta_y);
-        G4ThreeVector dir(std::sin(theta_x), std::sin(theta_y),
-                          std::cos(theta_tot));
-        dir = dir.unit();
+        G4double momentum =
+            G4RandGauss::shoot(nominalEnergy, sigmaP);
 
-        // ── Beam spot: uniform disk, 2 cm diameter ────────────────────
-        G4double r   = 1.0*cm * std::sqrt(G4UniformRand());  // uniform in disk
-        G4double phi = 2.*pi * G4UniformRand();
-        G4double vx  = r * std::cos(phi);
-        G4double vy  = r * std::sin(phi);
+        // Avoid unphysical negative/very small momentum.
+        momentum = std::max(momentum, 0.1 * GeV);
 
-        // ── Kinetic energy from smeared momentum ──────────────────────
-        G4double Esmeared = std::sqrt(ptot*ptot + m*m) - m;
+        // ----------------------------------------------------
+        // Beam angular divergence
+        // ----------------------------------------------------
 
-        fGun->SetParticleEnergy(Esmeared);
-        fGun->SetParticleMomentumDirection(dir);
-        fGun->SetParticlePosition(G4ThreeVector(vx, vy, -191.*cm));
-        fGun->GeneratePrimaryVertex(event);
+        const G4double thetaX =
+            G4RandGauss::shoot(
+                0.0,
+                SimulationConfig::kBeamAngularSigma
+            );
 
-        // Store vertex and momentum for CSV output
-        fLastVx = vx/mm;
-        fLastVy = vy/mm;
-        fLastPx = ptot * dir.x() / (MeV);
-        fLastPy = ptot * dir.y() / (MeV);
-        fLastPz = ptot * dir.z() / (MeV);
+        const G4double thetaY =
+            G4RandGauss::shoot(
+                0.0,
+                SimulationConfig::kBeamAngularSigma
+            );
+
+        G4ThreeVector direction(
+            std::sin(thetaX),
+            std::sin(thetaY),
+            1.0
+        );
+
+        direction = direction.unit();
+
+        // ----------------------------------------------------
+        // Circular beam spot
+        // ----------------------------------------------------
+
+        const G4double radius =
+            SimulationConfig::kBeamSpotRadius *
+            std::sqrt(G4UniformRand());
+
+        const G4double phi =
+            CLHEP::twopi * G4UniformRand();
+
+        const G4double x =
+            radius * std::cos(phi);
+
+        const G4double y =
+            radius * std::sin(phi);
+
+        // ----------------------------------------------------
+        // Configure particle
+        // ----------------------------------------------------
+
+        fParticleGun->SetParticleMomentum(momentum);
+        fParticleGun->SetParticleMomentumDirection(direction);
+
+        fParticleGun->SetParticlePosition(
+            G4ThreeVector(
+                x,
+                y,
+                SimulationConfig::kBeamVertexZ
+            )
+        );
+
+        fParticleGun->GeneratePrimaryVertex(event);
     }
 
-    // Accessors for EventAction
-    double GetLastVx() const { return fLastVx; }
-    double GetLastVy() const { return fLastVy; }
-    double GetLastPx() const { return fLastPx; }
-    double GetLastPy() const { return fLastPy; }
-    double GetLastPz() const { return fLastPz; }
-
 private:
-    G4ParticleGun* fGun;
-    double fLastVx=0, fLastVy=0;
-    double fLastPx=0, fLastPy=0, fLastPz=0;
+
+    G4ParticleGun* fParticleGun = nullptr;
 };
 
+
 // ============================================================
-//  RUN ACTION
+// Raw event output
 // ============================================================
+//
+// This output is intentionally analysis-agnostic.
+//
+// Every generated event is written.
+// No ML filtering.
+// No outlier rejection.
+// No ±20% beam-energy selection.
+// No target-specific preprocessing.
+//
+// Python/analysis code decides later what constitutes a
+// usable event for a particular scientific question.
+// ============================================================
+
+class CsvOutput
+{
+public:
+
+    static CsvOutput& Instance()
+    {
+        static CsvOutput instance;
+        return instance;
+    }
+
+    void Open(const std::string& filename)
+    {
+        std::lock_guard<std::mutex> lock(fMutex);
+
+        fFile.open(
+            filename,
+            std::ios::out |
+            std::ios::trunc
+        );
+
+        if (!fFile.is_open())
+        {
+            G4Exception(
+                "CsvOutput::Open",
+                "Output001",
+                FatalException,
+                "Could not open shower output file."
+            );
+        }
+
+        WriteHeader();
+    }
+
+    void Close()
+    {
+        std::lock_guard<std::mutex> lock(fMutex);
+
+        if (fFile.is_open())
+        {
+            fFile.flush();
+            fFile.close();
+        }
+    }
+
+    void WriteEvent(
+    G4int runID,
+    G4int eventID,
+    G4double nominalBeamEnergy,
+    const std::string& material,
+    G4double absorberThickness,
+    G4double absorberX0,
+    G4double beamEnergy,
+    const G4ThreeVector& beamMomentum,
+    G4double vertexX,
+    G4double vertexY,
+    const std::vector<G4double>& blockEnergy,
+    G4double totalEnergy,
+    G4double coreFraction,
+    G4double showerWidth
+    )
+
+
+    {
+        std::lock_guard<std::mutex> lock(fMutex);
+
+        if (!fFile.is_open())
+        {
+            return;
+        }
+
+        fFile
+            << runID << ','
+            << eventID << ','
+            << nominalBeamEnergy / GeV << ','
+            << material << ','
+            << absorberThickness / mm << ','
+            << absorberX0 / mm << ','
+            << beamEnergy / GeV << ','
+            << beamMomentum.x() / MeV << ','
+            << beamMomentum.y() / MeV << ','
+            << beamMomentum.z() / MeV << ','
+            << vertexX / mm << ','
+            << vertexY / mm;
+
+        for (G4double energy : blockEnergy)
+        {
+            fFile << ',' << energy / GeV;
+        }
+
+        fFile
+            << ',' << totalEnergy / GeV
+            << ',' << coreFraction
+            << ',' << showerWidth / cm
+            << '\n';
+    }
+
+private:
+
+    CsvOutput() = default;
+
+    void WriteHeader()
+    {
+        fFile
+            << "run_id,"
+            << "event_id,"
+            << "nominal_beam_energy_GeV,"
+            << "material,"
+            << "absorber_thickness_mm,"
+            << "absorber_x0_mm,"
+            << "beam_energy_GeV,"
+            << "beam_px_MeVc,"
+            << "beam_py_MeVc,"
+            << "beam_pz_MeVc,"
+            << "vertex_x_mm,"
+            << "vertex_y_mm";
+
+        for (G4int i = 0;
+             i < SimulationConfig::kNumberOfCalorimeterBlocks;
+             ++i)
+        {
+            fFile
+                << ",E_block_"
+                << i
+                << "_GeV";
+        }
+
+        fFile
+            << ",Etotal_GeV"
+            << ",CoreFraction"
+            << ",ShowerWidth_cm"
+            << '\n';
+    }
+
+    std::ofstream fFile;
+    std::mutex fMutex;
+};
+
+
+// ============================================================
+// Run Action
+// ============================================================
+
 class RunAction : public G4UserRunAction
 {
 public:
+
     RunAction() = default;
 
-    void BeginOfRunAction(const G4Run*) override {
-        if (isMaster) {
-            CsvOutput::open("shower_output.csv");
-            G4cout << "Output: shower_output.csv\n";
-        }
+    ~RunAction() override
+    {
+        CsvOutput::Instance().Close();
     }
 
-    void EndOfRunAction(const G4Run* run) override {
-        if (isMaster) {
-            CsvOutput::close();   // flush and close; file will be re-opened on next run
-            G4cout << "Run complete. Events: " << run->GetNumberOfEvent() << "\n";
-        }
-    }
-};
+    void BeginOfRunAction(const G4Run* run) override
+    {
+        const G4int runID = run->GetRunID();
 
-// ============================================================
-//  NOISE FILTER
-//
-//  Three-level noise rejection matching realistic beamline conditions:
-//
-//  Cut 1 — Sub-threshold block deposits (in CalorimeterSD.cc):
-//    Steps below 0.5 MeV dropped before accumulation.
-//    Mimics PMT discriminator threshold on lead-glass blocks.
-//
-//  Cut 2 — Beam miss (event-level):
-//    Etotal < 5% of beam energy → beam missed calorimeter.
-//    In real experiment: DWC tracks would show no hit in calo acceptance.
-//
-//  Cut 3 — Statistical outlier (event-level, Welford algorithm):
-//    Events > 3.5σ from running mean are anomalous secondaries
-//    (e.g. back-scatter, δ-rays reaching detector from upstream).
-//    Welford online algorithm: O(1) memory, numerically stable.
-//
-//  THREAD SAFETY NOTE:
-//    NoiseFilter is a member of EventAction, which is instantiated
-//    per worker thread by ActionInitialisation::Build(). Each worker
-//    therefore owns its own filter instance — no shared state.
-//    fLastMaterial and fLastThickness are likewise per-worker, so
-//    the configuration-change reset is safe in MT mode provided each
-//    worker sees a consistent view of detector parameters (guaranteed
-//    because ReinitializeGeometry() completes before any new run begins).
-// ============================================================
-struct NoiseFilter
-{
-    static constexpr double kMinFraction  = 0.05;
-    static constexpr double kOutlierSigma = 3.5;
+        // Each run gets its own output file.
+        const std::string filename =
+            "shower_output_run_" +
+            std::to_string(runID) +
+            ".csv";
 
-    long   n    = 0;
-    double mean = 0.;
-    double M2   = 0.;
-
-    void Reset() {
-        n    = 0;
-        mean = 0.;
-        M2   = 0.;
+        CsvOutput::Instance().Open(filename);
     }
 
-    void update(double x) {
-        ++n;
-        double d1 = x - mean;
-        mean += d1 / n;
-        M2   += d1 * (x - mean);
-    }
-
-    double stddev() const { return (n > 1) ? std::sqrt(M2/(n-1)) : 0.; }
-
-    bool accept(double Etot, double beamGeV) {
-        // Cut 2: beam-miss rejection — always applied regardless of warm-up state.
-        if (Etot < kMinFraction * beamGeV) return false;
-
-        // Cut 3: outlier rejection via Welford running statistics.
-        // WARM-UP NOTE: the outlier cut only activates after kWarmup accepted
-        // events have been collected. During warm-up all events passing cut 2
-        // are accepted unconditionally and used to seed the mean/variance.
-        // This means up to kWarmup abnormal events at the START of each
-        // configuration (after a filter Reset()) can bias the running mean.
-        // The reset happens on every configuration change (~72 times in a full
-        // material scan) so this window re-opens frequently.
-        // Mitigation: kWarmup is kept small (10) so the bias decays quickly;
-        // the 3.5-sigma cut is wide enough to tolerate a slightly biased mean
-        // for the first few post-warmup events.
-        static constexpr long kWarmup = 10;
-        if (n >= kWarmup) {
-            double s = stddev();
-            if (s > 0. && std::abs(Etot - mean) > kOutlierSigma * s)
-                return false;
-        }
-        update(Etot);
-        return true;
+    void EndOfRunAction(const G4Run*) override
+    {
+        CsvOutput::Instance().Close();
     }
 };
 
+
 // ============================================================
-//  EVENT ACTION
+// Event Action
 // ============================================================
+
 class EventAction : public G4UserEventAction
 {
 public:
-    EventAction() = default;
-    ~EventAction() override = default;
 
-    void EndOfEventAction(const G4Event* event) override
+    explicit EventAction(
+        const DetectorConstruction* detector
+    )
+        : fDetector(detector)
     {
-        G4Event* ev = const_cast<G4Event*>(event);
-
-        // ── Hit collection ───────────────────────────────────────────
-        auto* hce = ev->GetHCofThisEvent();
-        if (!hce) return;
-        int hcID = G4SDManager::GetSDMpointer()->GetCollectionID("HitsCollection");
-        auto* hc = dynamic_cast<CaloHitsCollection*>(hce->GetHC(hcID));
-        if (!hc) return;
-
-        // ── Block energies ───────────────────────────────────────────
-        std::array<double,16> E = {};
-        for (int i = 0; i < 16; ++i)
-            E[i] = (*hc)[i]->GetEdep() / GeV;
-
-        double Etot = 0.;
-        for (double e : E) Etot += e;
-
-        // ── Beam metadata ────────────────────────────────────────────
-        double beamGeV = ev->GetPrimaryVertex()
-                           ->GetPrimary()->GetKineticEnergy() / GeV;
-
-        // ── Detector metadata ────────────────────────────────────────
-        // Must be fetched BEFORE the noise filter so we can detect
-        // configuration changes and reset the filter's running statistics.
-        auto* det = static_cast<const DetectorConstruction*>(
-            G4RunManager::GetRunManager()->GetUserDetectorConstruction());
-        std::string material    = det->GetAbsorberMaterial()->GetName();
-        // GetAbsorberThickness() now returns G4 internal units — divide by mm
-        // to get the numeric mm value for CSV, and use raw value for X0 ratio.
-        double      thickMM     = det->GetAbsorberThickness() / mm;
-        double      thickX0     = det->GetAbsorberThickness() /
-                                   det->GetAbsorberMaterial()->GetRadlen();
-
-        // ── Reset noise filter on configuration change ────────────────
-        // When material or thickness changes, the expected Etot distribution
-        // shifts. The Welford running mean from the previous configuration
-        // would incorrectly flag good events as outliers for ~50-100 events
-        // at the start of each new configuration. Reset to avoid this.
-        if (material != fLastMaterial ||
-            std::abs(thickMM - fLastThickness) > 0.01) {
-            fFilter.Reset();
-            fLastMaterial  = material;
-            fLastThickness = thickMM;
-        }
-
-        // ── Noise filter ─────────────────────────────────────────────
-        if (!fFilter.accept(Etot, beamGeV)) { ++fRejected; return; }
-
-        // ── Observables ──────────────────────────────────────────────
-
-        // Core fraction: central 2×2 (blocks 5,6,9,10 in 4×4 grid)
-        double Ecore        = E[5] + E[6] + E[9] + E[10];
-        double coreFraction = (Etot > 0.) ? Ecore / Etot : 0.;
-
-        // Lateral width: 2D energy-weighted radial RMS from array centre.
-        // Block centres (cm): col/row 0=-15, 1=-5, 2=+5, 3=+15
-        // Computes the full 2D radial RMS sqrt(sum(w*(x^2+y^2))/sum(w)),
-        // which is a proxy for the Moliere radius. This is NOT a 1D width
-        // in x only — both transverse dimensions are included.
-        // The beam is well-centred so the mean position is near zero —
-        // no mean subtraction is needed for a centred shower.
-        static const double xCentre[4] = {-15., -5.,  5., 15.};
-        static const double yCentre[4] = {-15., -5.,  5., 15.};
-        double sumW=0., sumWr2=0.;
-        for (int row = 0; row < 4; ++row) {
-            for (int col = 0; col < 4; ++col) {
-                double w = E[row*4 + col];
-                double x = xCentre[col];
-                double y = yCentre[row];
-                sumW   += w;
-                sumWr2 += w*(x*x + y*y);
-            }
-        }
-        double width = (sumW > 0.) ? std::sqrt(sumWr2 / sumW) : 0.;
-
-        // ── Beam vertex/momentum (from generator) ────────────────────
-        // Access via primary vertex directly
-        auto* vtx = ev->GetPrimaryVertex();
-        double vx = vtx->GetX0()/mm;
-        double vy = vtx->GetY0()/mm;
-        auto*  p  = vtx->GetPrimary();
-        double px = p->GetPx()/(MeV);
-        double py = p->GetPy()/(MeV);
-        double pz = p->GetPz()/(MeV);
-
-        // ── Write CSV ────────────────────────────────────────────────
-        CsvOutput::write(ev->GetEventID(),
-                         material, thickMM, thickX0, beamGeV,
-                         px, py, pz, vx, vy,
-                         E, Etot, coreFraction, width);
     }
 
-    long GetRejected() const { return fRejected; }
+    ~EventAction() override = default;
+
+    void EndOfEventAction(
+        const G4Event* event
+    ) override
+    {
+        // ----------------------------------------------------
+        // Retrieve calorimeter hit collection
+        // ----------------------------------------------------
+
+        auto* hce = event->GetHCofThisEvent();
+
+        if (!hce)
+        {
+            return;
+        }
+
+        auto* hits =
+            static_cast<G4THitsCollection<CaloHit>*>(
+                hce->GetHC(
+                    G4SDManager::GetSDMpointer()
+                        ->GetCollectionID("CalorimeterSD/CaloHits")
+                )
+            );
+
+        if (!hits)
+        {
+            return;
+        }
+
+        // ----------------------------------------------------
+        // Read block energies
+        // ----------------------------------------------------
+
+        std::vector<G4double> blockEnergy(
+            SimulationConfig::kNumberOfCalorimeterBlocks,
+            0.0
+        );
+
+        G4double totalEnergy = 0.0;
+
+        for (G4int i = 0;
+             i < SimulationConfig::kNumberOfCalorimeterBlocks;
+             ++i)
+        {
+            if ((*hits)[i])
+            {
+                blockEnergy[i] =
+                    (*hits)[i]->GetEdep();
+
+                totalEnergy += blockEnergy[i];
+            }
+        }
+
+        // ----------------------------------------------------
+        // Primary beam information
+        // ----------------------------------------------------
+
+        const auto* primaryVertex =
+            event->GetPrimaryVertex();
+
+        if (!primaryVertex)
+        {
+            return;
+        }
+
+        const auto* primary =
+            primaryVertex->GetPrimary();
+
+        if (!primary)
+        {
+            return;
+        }
+
+        const G4double beamEnergy =
+            primary->GetKineticEnergy();
+
+        const G4ThreeVector beamMomentum =
+            primary->GetMomentum();
+
+        const G4double vertexX =
+            primaryVertex->GetX0();
+
+        const G4double vertexY =
+            primaryVertex->GetY0();
+
+        // ----------------------------------------------------
+        // Detector truth/configuration
+        // ----------------------------------------------------
+
+        const std::string material =
+            fDetector->GetAbsorberMaterial()->GetName();
+
+        const G4double absorberThickness =
+            fDetector->GetAbsorberThickness();
+
+        const G4double absorberX0 =
+            fDetector->GetAbsorberMaterial()->GetRadlen();
+
+        const G4double nominalBeamEnergy =
+            beamEnergy;
+
+        // ----------------------------------------------------
+        // Central 2x2 energy fraction
+        //
+        // Block layout:
+        //
+        // 0  1  2  3
+        // 4  5  6  7
+        // 8  9 10 11
+        // 12 13 14 15
+        //
+        // Central blocks = 5,6,9,10
+        // ----------------------------------------------------
+
+        const G4double coreEnergy =
+            blockEnergy[5] +
+            blockEnergy[6] +
+            blockEnergy[9] +
+            blockEnergy[10];
+
+        G4double coreFraction = 0.0;
+
+        if (totalEnergy > 0.0)
+        {
+            coreFraction =
+                coreEnergy / totalEnergy;
+        }
+
+        // ----------------------------------------------------
+        // Lateral shower width
+        // ----------------------------------------------------
+
+        G4double weightedR2 = 0.0;
+
+        for (G4int row = 0; row < 4; ++row)
+        {
+            for (G4int col = 0; col < 4; ++col)
+            {
+                const G4int index =
+                    row * 4 + col;
+
+                const G4double x =
+                    (static_cast<G4double>(col) - 1.5)
+                    * 10.0 * cm;
+
+                const G4double y =
+                    (static_cast<G4double>(row) - 1.5)
+                    * 10.0 * cm;
+
+                const G4double r2 =
+                    x * x + y * y;
+
+                weightedR2 +=
+                    blockEnergy[index] * r2;
+            }
+        }
+
+        G4double showerWidth = 0.0;
+
+        if (totalEnergy > 0.0)
+        {
+            showerWidth =
+                std::sqrt(
+                    weightedR2 / totalEnergy
+                );
+        }
+
+        // ----------------------------------------------------
+        // Write EVERY event.
+        //
+        // No filtering happens here.
+        // ----------------------------------------------------
+
+        
+        CsvOutput::Instance().WriteEvent(
+            G4RunManager::GetRunManager()->GetCurrentRun()->GetRunID(),
+            event->GetEventID(),
+            nominalBeamEnergy,
+            material,
+            absorberThickness,
+            absorberX0,
+            beamEnergy,
+            beamMomentum,
+            vertexX,
+            vertexY,
+            blockEnergy,
+            totalEnergy,
+            coreFraction,
+            showerWidth
+        );
+    }
 
 private:
-    NoiseFilter fFilter;
-    long        fRejected      = 0;
-    std::string fLastMaterial  = "";
-    double      fLastThickness = -1.;
+
+    const DetectorConstruction* fDetector = nullptr;
 };
 
-// ── ActionInitialisation ──────────────────────────────────────────────────────
-void ActionInitialisation::BuildForMaster() const { SetUserAction(new RunAction()); }
 
-void ActionInitialisation::Build() const {
-    SetUserAction(new PrimaryGeneratorAction());
-    SetUserAction(new RunAction());
-    SetUserAction(new EventAction());
+// ============================================================
+// ActionInitialisation
+// ============================================================
+
+void ActionInitialisation::BuildForMaster() const
+{
+    SetUserAction(
+        new RunAction()
+    );
+}
+
+
+void ActionInitialisation::Build() const
+{
+    auto* detector =
+        static_cast<const DetectorConstruction*>(
+            G4RunManager::GetRunManager()
+                ->GetUserDetectorConstruction()
+        );
+
+    SetUserAction(
+        new PrimaryGeneratorAction()
+    );
+
+    SetUserAction(
+        new RunAction()
+    );
+
+    SetUserAction(
+        new EventAction(detector)
+    );
 }

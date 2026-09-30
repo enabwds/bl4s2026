@@ -1,0 +1,771 @@
+== gun/energy ==
+./trace_output.txt:1:== gun/energy ==
+./README.md:140:/gun/energy 4 GeV
+./macros/vis.mac:25:/gun/energy 2 GeV
+./macros/run_material_scan.mac:23:/gun/energy 1 GeV
+./macros/run_material_scan.mac:37:/gun/energy 2 GeV
+./macros/run_material_scan.mac:51:/gun/energy 4 GeV
+./macros/run_material_scan.mac:70:/gun/energy 1 GeV
+./macros/run_material_scan.mac:84:/gun/energy 2 GeV
+./macros/run_material_scan.mac:98:/gun/energy 4 GeV
+./macros/run_material_scan.mac:117:/gun/energy 1 GeV
+./macros/run_material_scan.mac:131:/gun/energy 2 GeV
+./macros/run_material_scan.mac:145:/gun/energy 4 GeV
+./macros/run_material_scan.mac:165:/gun/energy 1 GeV
+./macros/run_material_scan.mac:179:/gun/energy 2 GeV
+./macros/run_material_scan.mac:193:/gun/energy 4 GeV
+./macros/run_extended_materials.mac:31:/gun/energy 1 GeV
+./macros/run_extended_materials.mac:45:/gun/energy 2 GeV
+./macros/run_extended_materials.mac:59:/gun/energy 4 GeV
+./macros/run_extended_materials.mac:81:/gun/energy 1 GeV
+./macros/run_extended_materials.mac:95:/gun/energy 2 GeV
+./macros/run_extended_materials.mac:109:/gun/energy 4 GeV
+./macros/run_extended_materials.mac:132:/gun/energy 1 GeV
+./macros/run_extended_materials.mac:146:/gun/energy 2 GeV
+./macros/run_extended_materials.mac:160:/gun/energy 4 GeV
+./macros/run_blind.mac:24:/gun/energy 1 GeV
+./macros/run_blind.mac:38:/gun/energy 2 GeV
+./macros/run_blind.mac:52:/gun/energy 4 GeV
+./macros/run_iron.mac:20:/gun/energy 1 GeV
+./macros/run_iron.mac:41:/gun/energy 2 GeV
+./macros/run_iron.mac:62:/gun/energy 4 GeV
+./build/macros/vis.mac:25:/gun/energy 2 GeV
+./build/macros/run_material_scan.mac:23:/gun/energy 1 GeV
+./build/macros/run_material_scan.mac:37:/gun/energy 2 GeV
+./build/macros/run_material_scan.mac:51:/gun/energy 4 GeV
+./build/macros/run_material_scan.mac:70:/gun/energy 1 GeV
+./build/macros/run_material_scan.mac:84:/gun/energy 2 GeV
+./build/macros/run_material_scan.mac:98:/gun/energy 4 GeV
+./build/macros/run_material_scan.mac:117:/gun/energy 1 GeV
+./build/macros/run_material_scan.mac:131:/gun/energy 2 GeV
+./build/macros/run_material_scan.mac:145:/gun/energy 4 GeV
+./build/macros/run_material_scan.mac:165:/gun/energy 1 GeV
+./build/macros/run_material_scan.mac:179:/gun/energy 2 GeV
+./build/macros/run_material_scan.mac:193:/gun/energy 4 GeV
+./build/macros/run_extended_materials.mac:31:/gun/energy 1 GeV
+./build/macros/run_extended_materials.mac:45:/gun/energy 2 GeV
+./build/macros/run_extended_materials.mac:59:/gun/energy 4 GeV
+./build/macros/run_extended_materials.mac:81:/gun/energy 1 GeV
+./build/macros/run_extended_materials.mac:95:/gun/energy 2 GeV
+./build/macros/run_extended_materials.mac:109:/gun/energy 4 GeV
+./build/macros/run_extended_materials.mac:132:/gun/energy 1 GeV
+./build/macros/run_extended_materials.mac:146:/gun/energy 2 GeV
+./build/macros/run_extended_materials.mac:160:/gun/energy 4 GeV
+./build/macros/run_blind.mac:24:/gun/energy 1 GeV
+./build/macros/run_blind.mac:38:/gun/energy 2 GeV
+./build/macros/run_blind.mac:52:/gun/energy 4 GeV
+./build/macros/run_iron.mac:20:/gun/energy 1 GeV
+./build/macros/run_iron.mac:41:/gun/energy 2 GeV
+./build/macros/run_iron.mac:62:/gun/energy 4 GeV
+./src/ActionInitialisation.cc:99://  Energies      : 1, 2, 4 GeV (set via /gun/energy macro command)
+
+== production commands ==
+./include/DetectorConstruction.hh:29:    void SetAbsorberMaterial(const G4String& name);
+./include/DetectorConstruction.hh:30:    void SetAbsorberThickness(G4double thickness);  // must be in G4 internal units (pass value * mm)
+./include/DetectorMessenger.hh:7://    /det/setAbsorberMaterial G4_Fe
+./include/DetectorMessenger.hh:8://    /det/setAbsorberThickness 20 mm
+./README.md:133:/det/setAbsorberMaterial G4_Pb
+./README.md:136:/det/setAbsorberThickness 20 mm
+./README.md:141:/run/beamOn 2000
+./macros/vis.mac:26:/det/setAbsorberMaterial G4_Al
+./macros/vis.mac:27:/det/setAbsorberThickness 89.0 mm
+./macros/vis.mac:28:/run/beamOn 5
+./macros/run_material_scan.mac:21:/det/setAbsorberMaterial G4_Al
+./macros/run_material_scan.mac:24:/det/setAbsorberThickness 44.5 mm
+./macros/run_material_scan.mac:25:/run/beamOn 2000
+./macros/run_material_scan.mac:26:/det/setAbsorberThickness 89.0 mm
+./macros/run_material_scan.mac:27:/run/beamOn 2000
+./macros/run_material_scan.mac:28:/det/setAbsorberThickness 178.0 mm
+./macros/run_material_scan.mac:29:/run/beamOn 2000
+./macros/run_material_scan.mac:30:/det/setAbsorberThickness 267.0 mm
+./macros/run_material_scan.mac:31:/run/beamOn 2000
+./macros/run_material_scan.mac:32:/det/setAbsorberThickness 356.0 mm
+./macros/run_material_scan.mac:33:/run/beamOn 2000
+./macros/run_material_scan.mac:34:/det/setAbsorberThickness 444.85 mm
+./macros/run_material_scan.mac:35:/run/beamOn 2000
+./macros/run_material_scan.mac:38:/det/setAbsorberThickness 44.5 mm
+./macros/run_material_scan.mac:39:/run/beamOn 2000
+./macros/run_material_scan.mac:40:/det/setAbsorberThickness 89.0 mm
+./macros/run_material_scan.mac:41:/run/beamOn 2000
+./macros/run_material_scan.mac:42:/det/setAbsorberThickness 178.0 mm
+./macros/run_material_scan.mac:43:/run/beamOn 2000
+./macros/run_material_scan.mac:44:/det/setAbsorberThickness 267.0 mm
+./macros/run_material_scan.mac:45:/run/beamOn 2000
+./macros/run_material_scan.mac:46:/det/setAbsorberThickness 356.0 mm
+./macros/run_material_scan.mac:47:/run/beamOn 2000
+./macros/run_material_scan.mac:48:/det/setAbsorberThickness 444.85 mm
+./macros/run_material_scan.mac:49:/run/beamOn 2000
+./macros/run_material_scan.mac:52:/det/setAbsorberThickness 44.5 mm
+./macros/run_material_scan.mac:53:/run/beamOn 2000
+./macros/run_material_scan.mac:54:/det/setAbsorberThickness 89.0 mm
+./macros/run_material_scan.mac:55:/run/beamOn 2000
+./macros/run_material_scan.mac:56:/det/setAbsorberThickness 178.0 mm
+./macros/run_material_scan.mac:57:/run/beamOn 2000
+./macros/run_material_scan.mac:58:/det/setAbsorberThickness 267.0 mm
+./macros/run_material_scan.mac:59:/run/beamOn 2000
+./macros/run_material_scan.mac:60:/det/setAbsorberThickness 356.0 mm
+./macros/run_material_scan.mac:61:/run/beamOn 2000
+./macros/run_material_scan.mac:62:/det/setAbsorberThickness 444.85 mm
+./macros/run_material_scan.mac:63:/run/beamOn 2000
+./macros/run_material_scan.mac:68:/det/setAbsorberMaterial G4_Fe
+./macros/run_material_scan.mac:71:/det/setAbsorberThickness 8.79 mm
+./macros/run_material_scan.mac:72:/run/beamOn 2000
+./macros/run_material_scan.mac:73:/det/setAbsorberThickness 17.57 mm
+./macros/run_material_scan.mac:74:/run/beamOn 2000
+./macros/run_material_scan.mac:75:/det/setAbsorberThickness 35.14 mm
+./macros/run_material_scan.mac:76:/run/beamOn 2000
+./macros/run_material_scan.mac:77:/det/setAbsorberThickness 52.71 mm
+./macros/run_material_scan.mac:78:/run/beamOn 2000
+./macros/run_material_scan.mac:79:/det/setAbsorberThickness 70.28 mm
+./macros/run_material_scan.mac:80:/run/beamOn 2000
+./macros/run_material_scan.mac:81:/det/setAbsorberThickness 87.85 mm
+./macros/run_material_scan.mac:82:/run/beamOn 2000
+./macros/run_material_scan.mac:85:/det/setAbsorberThickness 8.79 mm
+./macros/run_material_scan.mac:86:/run/beamOn 2000
+./macros/run_material_scan.mac:87:/det/setAbsorberThickness 17.57 mm
+./macros/run_material_scan.mac:88:/run/beamOn 2000
+./macros/run_material_scan.mac:89:/det/setAbsorberThickness 35.14 mm
+./macros/run_material_scan.mac:90:/run/beamOn 2000
+./macros/run_material_scan.mac:91:/det/setAbsorberThickness 52.71 mm
+./macros/run_material_scan.mac:92:/run/beamOn 2000
+./macros/run_material_scan.mac:93:/det/setAbsorberThickness 70.28 mm
+./macros/run_material_scan.mac:94:/run/beamOn 2000
+./macros/run_material_scan.mac:95:/det/setAbsorberThickness 87.85 mm
+./macros/run_material_scan.mac:96:/run/beamOn 2000
+./macros/run_material_scan.mac:99:/det/setAbsorberThickness 8.79 mm
+./macros/run_material_scan.mac:100:/run/beamOn 2000
+./macros/run_material_scan.mac:101:/det/setAbsorberThickness 17.57 mm
+./macros/run_material_scan.mac:102:/run/beamOn 2000
+./macros/run_material_scan.mac:103:/det/setAbsorberThickness 35.14 mm
+./macros/run_material_scan.mac:104:/run/beamOn 2000
+./macros/run_material_scan.mac:105:/det/setAbsorberThickness 52.71 mm
+./macros/run_material_scan.mac:106:/run/beamOn 2000
+./macros/run_material_scan.mac:107:/det/setAbsorberThickness 70.28 mm
+./macros/run_material_scan.mac:108:/run/beamOn 2000
+./macros/run_material_scan.mac:109:/det/setAbsorberThickness 87.85 mm
+./macros/run_material_scan.mac:110:/run/beamOn 2000
+./macros/run_material_scan.mac:115:/det/setAbsorberMaterial G4_Cu
+./macros/run_material_scan.mac:118:/det/setAbsorberThickness 7.18 mm
+./macros/run_material_scan.mac:119:/run/beamOn 2000
+./macros/run_material_scan.mac:120:/det/setAbsorberThickness 14.36 mm
+./macros/run_material_scan.mac:121:/run/beamOn 2000
+./macros/run_material_scan.mac:122:/det/setAbsorberThickness 28.72 mm
+./macros/run_material_scan.mac:123:/run/beamOn 2000
+./macros/run_material_scan.mac:124:/det/setAbsorberThickness 43.08 mm
+./macros/run_material_scan.mac:125:/run/beamOn 2000
+./macros/run_material_scan.mac:126:/det/setAbsorberThickness 57.44 mm
+./macros/run_material_scan.mac:127:/run/beamOn 2000
+./macros/run_material_scan.mac:128:/det/setAbsorberThickness 71.80 mm
+./macros/run_material_scan.mac:129:/run/beamOn 2000
+./macros/run_material_scan.mac:132:/det/setAbsorberThickness 7.18 mm
+./macros/run_material_scan.mac:133:/run/beamOn 2000
+./macros/run_material_scan.mac:134:/det/setAbsorberThickness 14.36 mm
+./macros/run_material_scan.mac:135:/run/beamOn 2000
+./macros/run_material_scan.mac:136:/det/setAbsorberThickness 28.72 mm
+./macros/run_material_scan.mac:137:/run/beamOn 2000
+./macros/run_material_scan.mac:138:/det/setAbsorberThickness 43.08 mm
+./macros/run_material_scan.mac:139:/run/beamOn 2000
+./macros/run_material_scan.mac:140:/det/setAbsorberThickness 57.44 mm
+./macros/run_material_scan.mac:141:/run/beamOn 2000
+./macros/run_material_scan.mac:142:/det/setAbsorberThickness 71.80 mm
+./macros/run_material_scan.mac:143:/run/beamOn 2000
+./macros/run_material_scan.mac:146:/det/setAbsorberThickness 7.18 mm
+./macros/run_material_scan.mac:147:/run/beamOn 2000
+./macros/run_material_scan.mac:148:/det/setAbsorberThickness 14.36 mm
+./macros/run_material_scan.mac:149:/run/beamOn 2000
+./macros/run_material_scan.mac:150:/det/setAbsorberThickness 28.72 mm
+./macros/run_material_scan.mac:151:/run/beamOn 2000
+./macros/run_material_scan.mac:152:/det/setAbsorberThickness 43.08 mm
+./macros/run_material_scan.mac:153:/run/beamOn 2000
+./macros/run_material_scan.mac:154:/det/setAbsorberThickness 57.44 mm
+./macros/run_material_scan.mac:155:/run/beamOn 2000
+./macros/run_material_scan.mac:156:/det/setAbsorberThickness 71.80 mm
+./macros/run_material_scan.mac:157:/run/beamOn 2000
+./macros/run_material_scan.mac:163:/det/setAbsorberMaterial G4_Pb
+./macros/run_material_scan.mac:166:/det/setAbsorberThickness 2.81 mm
+./macros/run_material_scan.mac:167:/run/beamOn 2000
+./macros/run_material_scan.mac:168:/det/setAbsorberThickness 5.61 mm
+./macros/run_material_scan.mac:169:/run/beamOn 2000
+./macros/run_material_scan.mac:170:/det/setAbsorberThickness 11.22 mm
+./macros/run_material_scan.mac:171:/run/beamOn 2000
+./macros/run_material_scan.mac:172:/det/setAbsorberThickness 16.84 mm
+./macros/run_material_scan.mac:173:/run/beamOn 2000
+./macros/run_material_scan.mac:174:/det/setAbsorberThickness 22.45 mm
+./macros/run_material_scan.mac:175:/run/beamOn 2000
+./macros/run_material_scan.mac:176:/det/setAbsorberThickness 28.06 mm
+./macros/run_material_scan.mac:177:/run/beamOn 2000
+./macros/run_material_scan.mac:180:/det/setAbsorberThickness 2.81 mm
+./macros/run_material_scan.mac:181:/run/beamOn 2000
+./macros/run_material_scan.mac:182:/det/setAbsorberThickness 5.61 mm
+./macros/run_material_scan.mac:183:/run/beamOn 2000
+./macros/run_material_scan.mac:184:/det/setAbsorberThickness 11.22 mm
+./macros/run_material_scan.mac:185:/run/beamOn 2000
+./macros/run_material_scan.mac:186:/det/setAbsorberThickness 16.84 mm
+./macros/run_material_scan.mac:187:/run/beamOn 2000
+./macros/run_material_scan.mac:188:/det/setAbsorberThickness 22.45 mm
+./macros/run_material_scan.mac:189:/run/beamOn 2000
+./macros/run_material_scan.mac:190:/det/setAbsorberThickness 28.06 mm
+./macros/run_material_scan.mac:191:/run/beamOn 2000
+./macros/run_material_scan.mac:194:/det/setAbsorberThickness 2.81 mm
+./macros/run_material_scan.mac:195:/run/beamOn 2000
+./macros/run_material_scan.mac:196:/det/setAbsorberThickness 5.61 mm
+./macros/run_material_scan.mac:197:/run/beamOn 2000
+./macros/run_material_scan.mac:198:/det/setAbsorberThickness 11.22 mm
+./macros/run_material_scan.mac:199:/run/beamOn 2000
+./macros/run_material_scan.mac:200:/det/setAbsorberThickness 16.84 mm
+./macros/run_material_scan.mac:201:/run/beamOn 2000
+./macros/run_material_scan.mac:202:/det/setAbsorberThickness 22.45 mm
+./macros/run_material_scan.mac:203:/run/beamOn 2000
+./macros/run_material_scan.mac:204:/det/setAbsorberThickness 28.06 mm
+./macros/run_material_scan.mac:205:/run/beamOn 2000
+./macros/run_extended_materials.mac:29:/det/setAbsorberMaterial G4_Ti
+./macros/run_extended_materials.mac:32:/det/setAbsorberThickness 17.8 mm
+./macros/run_extended_materials.mac:33:/run/beamOn 2000
+./macros/run_extended_materials.mac:34:/det/setAbsorberThickness 35.6 mm
+./macros/run_extended_materials.mac:35:/run/beamOn 2000
+./macros/run_extended_materials.mac:36:/det/setAbsorberThickness 71.2 mm
+./macros/run_extended_materials.mac:37:/run/beamOn 2000
+./macros/run_extended_materials.mac:38:/det/setAbsorberThickness 106.8 mm
+./macros/run_extended_materials.mac:39:/run/beamOn 2000
+./macros/run_extended_materials.mac:40:/det/setAbsorberThickness 142.4 mm
+./macros/run_extended_materials.mac:41:/run/beamOn 2000
+./macros/run_extended_materials.mac:42:/det/setAbsorberThickness 178.0 mm
+./macros/run_extended_materials.mac:43:/run/beamOn 2000
+./macros/run_extended_materials.mac:46:/det/setAbsorberThickness 17.8 mm
+./macros/run_extended_materials.mac:47:/run/beamOn 2000
+./macros/run_extended_materials.mac:48:/det/setAbsorberThickness 35.6 mm
+./macros/run_extended_materials.mac:49:/run/beamOn 2000
+./macros/run_extended_materials.mac:50:/det/setAbsorberThickness 71.2 mm
+./macros/run_extended_materials.mac:51:/run/beamOn 2000
+./macros/run_extended_materials.mac:52:/det/setAbsorberThickness 106.8 mm
+./macros/run_extended_materials.mac:53:/run/beamOn 2000
+./macros/run_extended_materials.mac:54:/det/setAbsorberThickness 142.4 mm
+./macros/run_extended_materials.mac:55:/run/beamOn 2000
+./macros/run_extended_materials.mac:56:/det/setAbsorberThickness 178.0 mm
+./macros/run_extended_materials.mac:57:/run/beamOn 2000
+./macros/run_extended_materials.mac:60:/det/setAbsorberThickness 17.8 mm
+./macros/run_extended_materials.mac:61:/run/beamOn 2000
+./macros/run_extended_materials.mac:62:/det/setAbsorberThickness 35.6 mm
+./macros/run_extended_materials.mac:63:/run/beamOn 2000
+./macros/run_extended_materials.mac:64:/det/setAbsorberThickness 71.2 mm
+./macros/run_extended_materials.mac:65:/run/beamOn 2000
+./macros/run_extended_materials.mac:66:/det/setAbsorberThickness 106.8 mm
+./macros/run_extended_materials.mac:67:/run/beamOn 2000
+./macros/run_extended_materials.mac:68:/det/setAbsorberThickness 142.4 mm
+./macros/run_extended_materials.mac:69:/run/beamOn 2000
+./macros/run_extended_materials.mac:70:/det/setAbsorberThickness 178.0 mm
+./macros/run_extended_materials.mac:71:/run/beamOn 2000
+./macros/run_extended_materials.mac:79:/det/setAbsorberMaterial G4_Sn
+./macros/run_extended_materials.mac:82:/det/setAbsorberThickness 6.03 mm
+./macros/run_extended_materials.mac:83:/run/beamOn 2000
+./macros/run_extended_materials.mac:84:/det/setAbsorberThickness 12.06 mm
+./macros/run_extended_materials.mac:85:/run/beamOn 2000
+./macros/run_extended_materials.mac:86:/det/setAbsorberThickness 24.12 mm
+./macros/run_extended_materials.mac:87:/run/beamOn 2000
+./macros/run_extended_materials.mac:88:/det/setAbsorberThickness 36.18 mm
+./macros/run_extended_materials.mac:89:/run/beamOn 2000
+./macros/run_extended_materials.mac:90:/det/setAbsorberThickness 48.24 mm
+./macros/run_extended_materials.mac:91:/run/beamOn 2000
+./macros/run_extended_materials.mac:92:/det/setAbsorberThickness 60.30 mm
+./macros/run_extended_materials.mac:93:/run/beamOn 2000
+./macros/run_extended_materials.mac:96:/det/setAbsorberThickness 6.03 mm
+./macros/run_extended_materials.mac:97:/run/beamOn 2000
+./macros/run_extended_materials.mac:98:/det/setAbsorberThickness 12.06 mm
+./macros/run_extended_materials.mac:99:/run/beamOn 2000
+./macros/run_extended_materials.mac:100:/det/setAbsorberThickness 24.12 mm
+./macros/run_extended_materials.mac:101:/run/beamOn 2000
+./macros/run_extended_materials.mac:102:/det/setAbsorberThickness 36.18 mm
+./macros/run_extended_materials.mac:103:/run/beamOn 2000
+./macros/run_extended_materials.mac:104:/det/setAbsorberThickness 48.24 mm
+./macros/run_extended_materials.mac:105:/run/beamOn 2000
+./macros/run_extended_materials.mac:106:/det/setAbsorberThickness 60.30 mm
+./macros/run_extended_materials.mac:107:/run/beamOn 2000
+./macros/run_extended_materials.mac:110:/det/setAbsorberThickness 6.03 mm
+./macros/run_extended_materials.mac:111:/run/beamOn 2000
+./macros/run_extended_materials.mac:112:/det/setAbsorberThickness 12.06 mm
+./macros/run_extended_materials.mac:113:/run/beamOn 2000
+./macros/run_extended_materials.mac:114:/det/setAbsorberThickness 24.12 mm
+./macros/run_extended_materials.mac:115:/run/beamOn 2000
+./macros/run_extended_materials.mac:116:/det/setAbsorberThickness 36.18 mm
+./macros/run_extended_materials.mac:117:/run/beamOn 2000
+./macros/run_extended_materials.mac:118:/det/setAbsorberThickness 48.24 mm
+./macros/run_extended_materials.mac:119:/run/beamOn 2000
+./macros/run_extended_materials.mac:120:/det/setAbsorberThickness 60.30 mm
+./macros/run_extended_materials.mac:121:/run/beamOn 2000
+./macros/run_extended_materials.mac:130:/det/setAbsorberMaterial G4_W
+./macros/run_extended_materials.mac:133:/det/setAbsorberThickness 1.75 mm
+./macros/run_extended_materials.mac:134:/run/beamOn 2000
+./macros/run_extended_materials.mac:135:/det/setAbsorberThickness 3.50 mm
+./macros/run_extended_materials.mac:136:/run/beamOn 2000
+./macros/run_extended_materials.mac:137:/det/setAbsorberThickness 7.00 mm
+./macros/run_extended_materials.mac:138:/run/beamOn 2000
+./macros/run_extended_materials.mac:139:/det/setAbsorberThickness 10.50 mm
+./macros/run_extended_materials.mac:140:/run/beamOn 2000
+./macros/run_extended_materials.mac:141:/det/setAbsorberThickness 14.00 mm
+./macros/run_extended_materials.mac:142:/run/beamOn 2000
+./macros/run_extended_materials.mac:143:/det/setAbsorberThickness 17.50 mm
+./macros/run_extended_materials.mac:144:/run/beamOn 2000
+./macros/run_extended_materials.mac:147:/det/setAbsorberThickness 1.75 mm
+./macros/run_extended_materials.mac:148:/run/beamOn 2000
+./macros/run_extended_materials.mac:149:/det/setAbsorberThickness 3.50 mm
+./macros/run_extended_materials.mac:150:/run/beamOn 2000
+./macros/run_extended_materials.mac:151:/det/setAbsorberThickness 7.00 mm
+./macros/run_extended_materials.mac:152:/run/beamOn 2000
+./macros/run_extended_materials.mac:153:/det/setAbsorberThickness 10.50 mm
+./macros/run_extended_materials.mac:154:/run/beamOn 2000
+./macros/run_extended_materials.mac:155:/det/setAbsorberThickness 14.00 mm
+./macros/run_extended_materials.mac:156:/run/beamOn 2000
+./macros/run_extended_materials.mac:157:/det/setAbsorberThickness 17.50 mm
+./macros/run_extended_materials.mac:158:/run/beamOn 2000
+./macros/run_extended_materials.mac:161:/det/setAbsorberThickness 1.75 mm
+./macros/run_extended_materials.mac:162:/run/beamOn 2000
+./macros/run_extended_materials.mac:163:/det/setAbsorberThickness 3.50 mm
+./macros/run_extended_materials.mac:164:/run/beamOn 2000
+./macros/run_extended_materials.mac:165:/det/setAbsorberThickness 7.00 mm
+./macros/run_extended_materials.mac:166:/run/beamOn 2000
+./macros/run_extended_materials.mac:167:/det/setAbsorberThickness 10.50 mm
+./macros/run_extended_materials.mac:168:/run/beamOn 2000
+./macros/run_extended_materials.mac:169:/det/setAbsorberThickness 14.00 mm
+./macros/run_extended_materials.mac:170:/run/beamOn 2000
+./macros/run_extended_materials.mac:171:/det/setAbsorberThickness 17.50 mm
+./macros/run_extended_materials.mac:172:/run/beamOn 2000
+./macros/run_blind.mac:16:/det/setAbsorberMaterial BlindSample
+./macros/run_blind.mac:25:/det/setAbsorberThickness 7.7 mm
+./macros/run_blind.mac:26:/run/beamOn 4500
+./macros/run_blind.mac:27:/det/setAbsorberThickness 15.4 mm
+./macros/run_blind.mac:28:/run/beamOn 4500
+./macros/run_blind.mac:29:/det/setAbsorberThickness 30.8 mm
+./macros/run_blind.mac:30:/run/beamOn 4500
+./macros/run_blind.mac:31:/det/setAbsorberThickness 46.2 mm
+./macros/run_blind.mac:32:/run/beamOn 4500
+./macros/run_blind.mac:33:/det/setAbsorberThickness 61.6 mm
+./macros/run_blind.mac:34:/run/beamOn 4500
+./macros/run_blind.mac:35:/det/setAbsorberThickness 77.0 mm
+./macros/run_blind.mac:36:/run/beamOn 4500
+./macros/run_blind.mac:39:/det/setAbsorberThickness 7.7 mm
+./macros/run_blind.mac:40:/run/beamOn 4500
+./macros/run_blind.mac:41:/det/setAbsorberThickness 15.4 mm
+./macros/run_blind.mac:42:/run/beamOn 4500
+./macros/run_blind.mac:43:/det/setAbsorberThickness 30.8 mm
+./macros/run_blind.mac:44:/run/beamOn 4500
+./macros/run_blind.mac:45:/det/setAbsorberThickness 46.2 mm
+./macros/run_blind.mac:46:/run/beamOn 4500
+./macros/run_blind.mac:47:/det/setAbsorberThickness 61.6 mm
+./macros/run_blind.mac:48:/run/beamOn 4500
+./macros/run_blind.mac:49:/det/setAbsorberThickness 77.0 mm
+./macros/run_blind.mac:50:/run/beamOn 4500
+./macros/run_blind.mac:53:/det/setAbsorberThickness 7.7 mm
+./macros/run_blind.mac:54:/run/beamOn 4500
+./macros/run_blind.mac:55:/det/setAbsorberThickness 15.4 mm
+./macros/run_blind.mac:56:/run/beamOn 4500
+./macros/run_blind.mac:57:/det/setAbsorberThickness 30.8 mm
+./macros/run_blind.mac:58:/run/beamOn 4500
+./macros/run_blind.mac:59:/det/setAbsorberThickness 46.2 mm
+./macros/run_blind.mac:60:/run/beamOn 4500
+./macros/run_blind.mac:61:/det/setAbsorberThickness 61.6 mm
+./macros/run_blind.mac:62:/run/beamOn 4500
+./macros/run_blind.mac:63:/det/setAbsorberThickness 77.0 mm
+./macros/run_blind.mac:64:/run/beamOn 4500
+./macros/run_iron.mac:13:/det/setAbsorberMaterial G4_Fe
+./macros/run_iron.mac:22:/det/setAbsorberThickness 8.79 mm
+./macros/run_iron.mac:23:/run/beamOn 2000
+./macros/run_iron.mac:25:/det/setAbsorberThickness 17.57 mm
+./macros/run_iron.mac:26:/run/beamOn 2000
+./macros/run_iron.mac:28:/det/setAbsorberThickness 35.14 mm
+./macros/run_iron.mac:29:/run/beamOn 2000
+./macros/run_iron.mac:31:/det/setAbsorberThickness 52.71 mm
+./macros/run_iron.mac:32:/run/beamOn 2000
+./macros/run_iron.mac:34:/det/setAbsorberThickness 70.28 mm
+./macros/run_iron.mac:35:/run/beamOn 2000
+./macros/run_iron.mac:37:/det/setAbsorberThickness 87.85 mm
+./macros/run_iron.mac:38:/run/beamOn 2000
+./macros/run_iron.mac:43:/det/setAbsorberThickness 8.79 mm
+./macros/run_iron.mac:44:/run/beamOn 2000
+./macros/run_iron.mac:46:/det/setAbsorberThickness 17.57 mm
+./macros/run_iron.mac:47:/run/beamOn 2000
+./macros/run_iron.mac:49:/det/setAbsorberThickness 35.14 mm
+./macros/run_iron.mac:50:/run/beamOn 2000
+./macros/run_iron.mac:52:/det/setAbsorberThickness 52.71 mm
+./macros/run_iron.mac:53:/run/beamOn 2000
+./macros/run_iron.mac:55:/det/setAbsorberThickness 70.28 mm
+./macros/run_iron.mac:56:/run/beamOn 2000
+./macros/run_iron.mac:58:/det/setAbsorberThickness 87.85 mm
+./macros/run_iron.mac:59:/run/beamOn 2000
+./macros/run_iron.mac:64:/det/setAbsorberThickness 8.79 mm
+./macros/run_iron.mac:65:/run/beamOn 2000
+./macros/run_iron.mac:67:/det/setAbsorberThickness 17.57 mm
+./macros/run_iron.mac:68:/run/beamOn 2000
+./macros/run_iron.mac:70:/det/setAbsorberThickness 35.14 mm
+./macros/run_iron.mac:71:/run/beamOn 2000
+./macros/run_iron.mac:73:/det/setAbsorberThickness 52.71 mm
+./macros/run_iron.mac:74:/run/beamOn 2000
+./macros/run_iron.mac:76:/det/setAbsorberThickness 70.28 mm
+./macros/run_iron.mac:77:/run/beamOn 2000
+./macros/run_iron.mac:79:/det/setAbsorberThickness 87.85 mm
+./macros/run_iron.mac:80:/run/beamOn 2000
+Binary file ./build/CMakeFiles/BL4S_sim.dir/src/DetectorConstruction.cc.o matches
+Binary file ./build/CMakeFiles/BL4S_sim.dir/src/DetectorMessenger.cc.o matches
+./build/macros/vis.mac:26:/det/setAbsorberMaterial G4_Al
+./build/macros/vis.mac:27:/det/setAbsorberThickness 89.0 mm
+./build/macros/vis.mac:28:/run/beamOn 5
+./build/macros/run_material_scan.mac:21:/det/setAbsorberMaterial G4_Al
+./build/macros/run_material_scan.mac:24:/det/setAbsorberThickness 44.5 mm
+./build/macros/run_material_scan.mac:25:/run/beamOn 2000
+./build/macros/run_material_scan.mac:26:/det/setAbsorberThickness 89.0 mm
+./build/macros/run_material_scan.mac:27:/run/beamOn 2000
+./build/macros/run_material_scan.mac:28:/det/setAbsorberThickness 178.0 mm
+./build/macros/run_material_scan.mac:29:/run/beamOn 2000
+./build/macros/run_material_scan.mac:30:/det/setAbsorberThickness 267.0 mm
+./build/macros/run_material_scan.mac:31:/run/beamOn 2000
+./build/macros/run_material_scan.mac:32:/det/setAbsorberThickness 356.0 mm
+./build/macros/run_material_scan.mac:33:/run/beamOn 2000
+./build/macros/run_material_scan.mac:34:/det/setAbsorberThickness 444.85 mm
+./build/macros/run_material_scan.mac:35:/run/beamOn 2000
+./build/macros/run_material_scan.mac:38:/det/setAbsorberThickness 44.5 mm
+./build/macros/run_material_scan.mac:39:/run/beamOn 2000
+./build/macros/run_material_scan.mac:40:/det/setAbsorberThickness 89.0 mm
+./build/macros/run_material_scan.mac:41:/run/beamOn 2000
+./build/macros/run_material_scan.mac:42:/det/setAbsorberThickness 178.0 mm
+./build/macros/run_material_scan.mac:43:/run/beamOn 2000
+./build/macros/run_material_scan.mac:44:/det/setAbsorberThickness 267.0 mm
+./build/macros/run_material_scan.mac:45:/run/beamOn 2000
+./build/macros/run_material_scan.mac:46:/det/setAbsorberThickness 356.0 mm
+./build/macros/run_material_scan.mac:47:/run/beamOn 2000
+./build/macros/run_material_scan.mac:48:/det/setAbsorberThickness 444.85 mm
+./build/macros/run_material_scan.mac:49:/run/beamOn 2000
+./build/macros/run_material_scan.mac:52:/det/setAbsorberThickness 44.5 mm
+./build/macros/run_material_scan.mac:53:/run/beamOn 2000
+./build/macros/run_material_scan.mac:54:/det/setAbsorberThickness 89.0 mm
+./build/macros/run_material_scan.mac:55:/run/beamOn 2000
+./build/macros/run_material_scan.mac:56:/det/setAbsorberThickness 178.0 mm
+./build/macros/run_material_scan.mac:57:/run/beamOn 2000
+./build/macros/run_material_scan.mac:58:/det/setAbsorberThickness 267.0 mm
+./build/macros/run_material_scan.mac:59:/run/beamOn 2000
+./build/macros/run_material_scan.mac:60:/det/setAbsorberThickness 356.0 mm
+./build/macros/run_material_scan.mac:61:/run/beamOn 2000
+./build/macros/run_material_scan.mac:62:/det/setAbsorberThickness 444.85 mm
+./build/macros/run_material_scan.mac:63:/run/beamOn 2000
+./build/macros/run_material_scan.mac:68:/det/setAbsorberMaterial G4_Fe
+./build/macros/run_material_scan.mac:71:/det/setAbsorberThickness 8.79 mm
+./build/macros/run_material_scan.mac:72:/run/beamOn 2000
+./build/macros/run_material_scan.mac:73:/det/setAbsorberThickness 17.57 mm
+./build/macros/run_material_scan.mac:74:/run/beamOn 2000
+./build/macros/run_material_scan.mac:75:/det/setAbsorberThickness 35.14 mm
+./build/macros/run_material_scan.mac:76:/run/beamOn 2000
+./build/macros/run_material_scan.mac:77:/det/setAbsorberThickness 52.71 mm
+./build/macros/run_material_scan.mac:78:/run/beamOn 2000
+./build/macros/run_material_scan.mac:79:/det/setAbsorberThickness 70.28 mm
+./build/macros/run_material_scan.mac:80:/run/beamOn 2000
+./build/macros/run_material_scan.mac:81:/det/setAbsorberThickness 87.85 mm
+./build/macros/run_material_scan.mac:82:/run/beamOn 2000
+./build/macros/run_material_scan.mac:85:/det/setAbsorberThickness 8.79 mm
+./build/macros/run_material_scan.mac:86:/run/beamOn 2000
+./build/macros/run_material_scan.mac:87:/det/setAbsorberThickness 17.57 mm
+./build/macros/run_material_scan.mac:88:/run/beamOn 2000
+./build/macros/run_material_scan.mac:89:/det/setAbsorberThickness 35.14 mm
+./build/macros/run_material_scan.mac:90:/run/beamOn 2000
+./build/macros/run_material_scan.mac:91:/det/setAbsorberThickness 52.71 mm
+./build/macros/run_material_scan.mac:92:/run/beamOn 2000
+./build/macros/run_material_scan.mac:93:/det/setAbsorberThickness 70.28 mm
+./build/macros/run_material_scan.mac:94:/run/beamOn 2000
+./build/macros/run_material_scan.mac:95:/det/setAbsorberThickness 87.85 mm
+./build/macros/run_material_scan.mac:96:/run/beamOn 2000
+./build/macros/run_material_scan.mac:99:/det/setAbsorberThickness 8.79 mm
+./build/macros/run_material_scan.mac:100:/run/beamOn 2000
+./build/macros/run_material_scan.mac:101:/det/setAbsorberThickness 17.57 mm
+./build/macros/run_material_scan.mac:102:/run/beamOn 2000
+./build/macros/run_material_scan.mac:103:/det/setAbsorberThickness 35.14 mm
+./build/macros/run_material_scan.mac:104:/run/beamOn 2000
+./build/macros/run_material_scan.mac:105:/det/setAbsorberThickness 52.71 mm
+./build/macros/run_material_scan.mac:106:/run/beamOn 2000
+./build/macros/run_material_scan.mac:107:/det/setAbsorberThickness 70.28 mm
+./build/macros/run_material_scan.mac:108:/run/beamOn 2000
+./build/macros/run_material_scan.mac:109:/det/setAbsorberThickness 87.85 mm
+./build/macros/run_material_scan.mac:110:/run/beamOn 2000
+./build/macros/run_material_scan.mac:115:/det/setAbsorberMaterial G4_Cu
+./build/macros/run_material_scan.mac:118:/det/setAbsorberThickness 7.18 mm
+./build/macros/run_material_scan.mac:119:/run/beamOn 2000
+./build/macros/run_material_scan.mac:120:/det/setAbsorberThickness 14.36 mm
+./build/macros/run_material_scan.mac:121:/run/beamOn 2000
+./build/macros/run_material_scan.mac:122:/det/setAbsorberThickness 28.72 mm
+./build/macros/run_material_scan.mac:123:/run/beamOn 2000
+./build/macros/run_material_scan.mac:124:/det/setAbsorberThickness 43.08 mm
+./build/macros/run_material_scan.mac:125:/run/beamOn 2000
+./build/macros/run_material_scan.mac:126:/det/setAbsorberThickness 57.44 mm
+./build/macros/run_material_scan.mac:127:/run/beamOn 2000
+./build/macros/run_material_scan.mac:128:/det/setAbsorberThickness 71.80 mm
+./build/macros/run_material_scan.mac:129:/run/beamOn 2000
+./build/macros/run_material_scan.mac:132:/det/setAbsorberThickness 7.18 mm
+./build/macros/run_material_scan.mac:133:/run/beamOn 2000
+./build/macros/run_material_scan.mac:134:/det/setAbsorberThickness 14.36 mm
+./build/macros/run_material_scan.mac:135:/run/beamOn 2000
+./build/macros/run_material_scan.mac:136:/det/setAbsorberThickness 28.72 mm
+./build/macros/run_material_scan.mac:137:/run/beamOn 2000
+./build/macros/run_material_scan.mac:138:/det/setAbsorberThickness 43.08 mm
+./build/macros/run_material_scan.mac:139:/run/beamOn 2000
+./build/macros/run_material_scan.mac:140:/det/setAbsorberThickness 57.44 mm
+./build/macros/run_material_scan.mac:141:/run/beamOn 2000
+./build/macros/run_material_scan.mac:142:/det/setAbsorberThickness 71.80 mm
+./build/macros/run_material_scan.mac:143:/run/beamOn 2000
+./build/macros/run_material_scan.mac:146:/det/setAbsorberThickness 7.18 mm
+./build/macros/run_material_scan.mac:147:/run/beamOn 2000
+./build/macros/run_material_scan.mac:148:/det/setAbsorberThickness 14.36 mm
+./build/macros/run_material_scan.mac:149:/run/beamOn 2000
+./build/macros/run_material_scan.mac:150:/det/setAbsorberThickness 28.72 mm
+./build/macros/run_material_scan.mac:151:/run/beamOn 2000
+./build/macros/run_material_scan.mac:152:/det/setAbsorberThickness 43.08 mm
+./build/macros/run_material_scan.mac:153:/run/beamOn 2000
+./build/macros/run_material_scan.mac:154:/det/setAbsorberThickness 57.44 mm
+./build/macros/run_material_scan.mac:155:/run/beamOn 2000
+./build/macros/run_material_scan.mac:156:/det/setAbsorberThickness 71.80 mm
+./build/macros/run_material_scan.mac:157:/run/beamOn 2000
+./build/macros/run_material_scan.mac:163:/det/setAbsorberMaterial G4_Pb
+./build/macros/run_material_scan.mac:166:/det/setAbsorberThickness 2.81 mm
+./build/macros/run_material_scan.mac:167:/run/beamOn 2000
+./build/macros/run_material_scan.mac:168:/det/setAbsorberThickness 5.61 mm
+./build/macros/run_material_scan.mac:169:/run/beamOn 2000
+./build/macros/run_material_scan.mac:170:/det/setAbsorberThickness 11.22 mm
+./build/macros/run_material_scan.mac:171:/run/beamOn 2000
+./build/macros/run_material_scan.mac:172:/det/setAbsorberThickness 16.84 mm
+./build/macros/run_material_scan.mac:173:/run/beamOn 2000
+./build/macros/run_material_scan.mac:174:/det/setAbsorberThickness 22.45 mm
+./build/macros/run_material_scan.mac:175:/run/beamOn 2000
+./build/macros/run_material_scan.mac:176:/det/setAbsorberThickness 28.06 mm
+./build/macros/run_material_scan.mac:177:/run/beamOn 2000
+./build/macros/run_material_scan.mac:180:/det/setAbsorberThickness 2.81 mm
+./build/macros/run_material_scan.mac:181:/run/beamOn 2000
+./build/macros/run_material_scan.mac:182:/det/setAbsorberThickness 5.61 mm
+./build/macros/run_material_scan.mac:183:/run/beamOn 2000
+./build/macros/run_material_scan.mac:184:/det/setAbsorberThickness 11.22 mm
+./build/macros/run_material_scan.mac:185:/run/beamOn 2000
+./build/macros/run_material_scan.mac:186:/det/setAbsorberThickness 16.84 mm
+./build/macros/run_material_scan.mac:187:/run/beamOn 2000
+./build/macros/run_material_scan.mac:188:/det/setAbsorberThickness 22.45 mm
+./build/macros/run_material_scan.mac:189:/run/beamOn 2000
+./build/macros/run_material_scan.mac:190:/det/setAbsorberThickness 28.06 mm
+./build/macros/run_material_scan.mac:191:/run/beamOn 2000
+./build/macros/run_material_scan.mac:194:/det/setAbsorberThickness 2.81 mm
+./build/macros/run_material_scan.mac:195:/run/beamOn 2000
+./build/macros/run_material_scan.mac:196:/det/setAbsorberThickness 5.61 mm
+./build/macros/run_material_scan.mac:197:/run/beamOn 2000
+./build/macros/run_material_scan.mac:198:/det/setAbsorberThickness 11.22 mm
+./build/macros/run_material_scan.mac:199:/run/beamOn 2000
+./build/macros/run_material_scan.mac:200:/det/setAbsorberThickness 16.84 mm
+./build/macros/run_material_scan.mac:201:/run/beamOn 2000
+./build/macros/run_material_scan.mac:202:/det/setAbsorberThickness 22.45 mm
+./build/macros/run_material_scan.mac:203:/run/beamOn 2000
+./build/macros/run_material_scan.mac:204:/det/setAbsorberThickness 28.06 mm
+./build/macros/run_material_scan.mac:205:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:29:/det/setAbsorberMaterial G4_Ti
+./build/macros/run_extended_materials.mac:32:/det/setAbsorberThickness 17.8 mm
+./build/macros/run_extended_materials.mac:33:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:34:/det/setAbsorberThickness 35.6 mm
+./build/macros/run_extended_materials.mac:35:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:36:/det/setAbsorberThickness 71.2 mm
+./build/macros/run_extended_materials.mac:37:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:38:/det/setAbsorberThickness 106.8 mm
+./build/macros/run_extended_materials.mac:39:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:40:/det/setAbsorberThickness 142.4 mm
+./build/macros/run_extended_materials.mac:41:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:42:/det/setAbsorberThickness 178.0 mm
+./build/macros/run_extended_materials.mac:43:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:46:/det/setAbsorberThickness 17.8 mm
+./build/macros/run_extended_materials.mac:47:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:48:/det/setAbsorberThickness 35.6 mm
+./build/macros/run_extended_materials.mac:49:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:50:/det/setAbsorberThickness 71.2 mm
+./build/macros/run_extended_materials.mac:51:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:52:/det/setAbsorberThickness 106.8 mm
+./build/macros/run_extended_materials.mac:53:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:54:/det/setAbsorberThickness 142.4 mm
+./build/macros/run_extended_materials.mac:55:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:56:/det/setAbsorberThickness 178.0 mm
+./build/macros/run_extended_materials.mac:57:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:60:/det/setAbsorberThickness 17.8 mm
+./build/macros/run_extended_materials.mac:61:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:62:/det/setAbsorberThickness 35.6 mm
+./build/macros/run_extended_materials.mac:63:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:64:/det/setAbsorberThickness 71.2 mm
+./build/macros/run_extended_materials.mac:65:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:66:/det/setAbsorberThickness 106.8 mm
+./build/macros/run_extended_materials.mac:67:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:68:/det/setAbsorberThickness 142.4 mm
+./build/macros/run_extended_materials.mac:69:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:70:/det/setAbsorberThickness 178.0 mm
+./build/macros/run_extended_materials.mac:71:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:79:/det/setAbsorberMaterial G4_Sn
+./build/macros/run_extended_materials.mac:82:/det/setAbsorberThickness 6.03 mm
+./build/macros/run_extended_materials.mac:83:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:84:/det/setAbsorberThickness 12.06 mm
+./build/macros/run_extended_materials.mac:85:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:86:/det/setAbsorberThickness 24.12 mm
+./build/macros/run_extended_materials.mac:87:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:88:/det/setAbsorberThickness 36.18 mm
+./build/macros/run_extended_materials.mac:89:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:90:/det/setAbsorberThickness 48.24 mm
+./build/macros/run_extended_materials.mac:91:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:92:/det/setAbsorberThickness 60.30 mm
+./build/macros/run_extended_materials.mac:93:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:96:/det/setAbsorberThickness 6.03 mm
+./build/macros/run_extended_materials.mac:97:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:98:/det/setAbsorberThickness 12.06 mm
+./build/macros/run_extended_materials.mac:99:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:100:/det/setAbsorberThickness 24.12 mm
+./build/macros/run_extended_materials.mac:101:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:102:/det/setAbsorberThickness 36.18 mm
+./build/macros/run_extended_materials.mac:103:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:104:/det/setAbsorberThickness 48.24 mm
+./build/macros/run_extended_materials.mac:105:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:106:/det/setAbsorberThickness 60.30 mm
+./build/macros/run_extended_materials.mac:107:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:110:/det/setAbsorberThickness 6.03 mm
+./build/macros/run_extended_materials.mac:111:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:112:/det/setAbsorberThickness 12.06 mm
+./build/macros/run_extended_materials.mac:113:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:114:/det/setAbsorberThickness 24.12 mm
+./build/macros/run_extended_materials.mac:115:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:116:/det/setAbsorberThickness 36.18 mm
+./build/macros/run_extended_materials.mac:117:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:118:/det/setAbsorberThickness 48.24 mm
+./build/macros/run_extended_materials.mac:119:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:120:/det/setAbsorberThickness 60.30 mm
+./build/macros/run_extended_materials.mac:121:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:130:/det/setAbsorberMaterial G4_W
+./build/macros/run_extended_materials.mac:133:/det/setAbsorberThickness 1.75 mm
+./build/macros/run_extended_materials.mac:134:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:135:/det/setAbsorberThickness 3.50 mm
+./build/macros/run_extended_materials.mac:136:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:137:/det/setAbsorberThickness 7.00 mm
+./build/macros/run_extended_materials.mac:138:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:139:/det/setAbsorberThickness 10.50 mm
+./build/macros/run_extended_materials.mac:140:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:141:/det/setAbsorberThickness 14.00 mm
+./build/macros/run_extended_materials.mac:142:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:143:/det/setAbsorberThickness 17.50 mm
+./build/macros/run_extended_materials.mac:144:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:147:/det/setAbsorberThickness 1.75 mm
+./build/macros/run_extended_materials.mac:148:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:149:/det/setAbsorberThickness 3.50 mm
+./build/macros/run_extended_materials.mac:150:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:151:/det/setAbsorberThickness 7.00 mm
+./build/macros/run_extended_materials.mac:152:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:153:/det/setAbsorberThickness 10.50 mm
+./build/macros/run_extended_materials.mac:154:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:155:/det/setAbsorberThickness 14.00 mm
+./build/macros/run_extended_materials.mac:156:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:157:/det/setAbsorberThickness 17.50 mm
+./build/macros/run_extended_materials.mac:158:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:161:/det/setAbsorberThickness 1.75 mm
+./build/macros/run_extended_materials.mac:162:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:163:/det/setAbsorberThickness 3.50 mm
+./build/macros/run_extended_materials.mac:164:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:165:/det/setAbsorberThickness 7.00 mm
+./build/macros/run_extended_materials.mac:166:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:167:/det/setAbsorberThickness 10.50 mm
+./build/macros/run_extended_materials.mac:168:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:169:/det/setAbsorberThickness 14.00 mm
+./build/macros/run_extended_materials.mac:170:/run/beamOn 2000
+./build/macros/run_extended_materials.mac:171:/det/setAbsorberThickness 17.50 mm
+./build/macros/run_extended_materials.mac:172:/run/beamOn 2000
+./build/macros/run_blind.mac:16:/det/setAbsorberMaterial BlindSample
+./build/macros/run_blind.mac:25:/det/setAbsorberThickness 7.7 mm
+./build/macros/run_blind.mac:26:/run/beamOn 4500
+./build/macros/run_blind.mac:27:/det/setAbsorberThickness 15.4 mm
+./build/macros/run_blind.mac:28:/run/beamOn 4500
+./build/macros/run_blind.mac:29:/det/setAbsorberThickness 30.8 mm
+./build/macros/run_blind.mac:30:/run/beamOn 4500
+./build/macros/run_blind.mac:31:/det/setAbsorberThickness 46.2 mm
+./build/macros/run_blind.mac:32:/run/beamOn 4500
+./build/macros/run_blind.mac:33:/det/setAbsorberThickness 61.6 mm
+./build/macros/run_blind.mac:34:/run/beamOn 4500
+./build/macros/run_blind.mac:35:/det/setAbsorberThickness 77.0 mm
+./build/macros/run_blind.mac:36:/run/beamOn 4500
+./build/macros/run_blind.mac:39:/det/setAbsorberThickness 7.7 mm
+./build/macros/run_blind.mac:40:/run/beamOn 4500
+./build/macros/run_blind.mac:41:/det/setAbsorberThickness 15.4 mm
+./build/macros/run_blind.mac:42:/run/beamOn 4500
+./build/macros/run_blind.mac:43:/det/setAbsorberThickness 30.8 mm
+./build/macros/run_blind.mac:44:/run/beamOn 4500
+./build/macros/run_blind.mac:45:/det/setAbsorberThickness 46.2 mm
+./build/macros/run_blind.mac:46:/run/beamOn 4500
+./build/macros/run_blind.mac:47:/det/setAbsorberThickness 61.6 mm
+./build/macros/run_blind.mac:48:/run/beamOn 4500
+./build/macros/run_blind.mac:49:/det/setAbsorberThickness 77.0 mm
+./build/macros/run_blind.mac:50:/run/beamOn 4500
+./build/macros/run_blind.mac:53:/det/setAbsorberThickness 7.7 mm
+./build/macros/run_blind.mac:54:/run/beamOn 4500
+./build/macros/run_blind.mac:55:/det/setAbsorberThickness 15.4 mm
+./build/macros/run_blind.mac:56:/run/beamOn 4500
+./build/macros/run_blind.mac:57:/det/setAbsorberThickness 30.8 mm
+./build/macros/run_blind.mac:58:/run/beamOn 4500
+./build/macros/run_blind.mac:59:/det/setAbsorberThickness 46.2 mm
+./build/macros/run_blind.mac:60:/run/beamOn 4500
+./build/macros/run_blind.mac:61:/det/setAbsorberThickness 61.6 mm
+./build/macros/run_blind.mac:62:/run/beamOn 4500
+./build/macros/run_blind.mac:63:/det/setAbsorberThickness 77.0 mm
+./build/macros/run_blind.mac:64:/run/beamOn 4500
+./build/macros/run_iron.mac:13:/det/setAbsorberMaterial G4_Fe
+./build/macros/run_iron.mac:22:/det/setAbsorberThickness 8.79 mm
+./build/macros/run_iron.mac:23:/run/beamOn 2000
+./build/macros/run_iron.mac:25:/det/setAbsorberThickness 17.57 mm
+./build/macros/run_iron.mac:26:/run/beamOn 2000
+./build/macros/run_iron.mac:28:/det/setAbsorberThickness 35.14 mm
+./build/macros/run_iron.mac:29:/run/beamOn 2000
+./build/macros/run_iron.mac:31:/det/setAbsorberThickness 52.71 mm
+./build/macros/run_iron.mac:32:/run/beamOn 2000
+./build/macros/run_iron.mac:34:/det/setAbsorberThickness 70.28 mm
+./build/macros/run_iron.mac:35:/run/beamOn 2000
+./build/macros/run_iron.mac:37:/det/setAbsorberThickness 87.85 mm
+./build/macros/run_iron.mac:38:/run/beamOn 2000
+./build/macros/run_iron.mac:43:/det/setAbsorberThickness 8.79 mm
+./build/macros/run_iron.mac:44:/run/beamOn 2000
+./build/macros/run_iron.mac:46:/det/setAbsorberThickness 17.57 mm
+./build/macros/run_iron.mac:47:/run/beamOn 2000
+./build/macros/run_iron.mac:49:/det/setAbsorberThickness 35.14 mm
+./build/macros/run_iron.mac:50:/run/beamOn 2000
+./build/macros/run_iron.mac:52:/det/setAbsorberThickness 52.71 mm
+./build/macros/run_iron.mac:53:/run/beamOn 2000
+./build/macros/run_iron.mac:55:/det/setAbsorberThickness 70.28 mm
+./build/macros/run_iron.mac:56:/run/beamOn 2000
+./build/macros/run_iron.mac:58:/det/setAbsorberThickness 87.85 mm
+./build/macros/run_iron.mac:59:/run/beamOn 2000
+./build/macros/run_iron.mac:64:/det/setAbsorberThickness 8.79 mm
+./build/macros/run_iron.mac:65:/run/beamOn 2000
+./build/macros/run_iron.mac:67:/det/setAbsorberThickness 17.57 mm
+./build/macros/run_iron.mac:68:/run/beamOn 2000
+./build/macros/run_iron.mac:70:/det/setAbsorberThickness 35.14 mm
+./build/macros/run_iron.mac:71:/run/beamOn 2000
+./build/macros/run_iron.mac:73:/det/setAbsorberThickness 52.71 mm
+./build/macros/run_iron.mac:74:/run/beamOn 2000
+./build/macros/run_iron.mac:76:/det/setAbsorberThickness 70.28 mm
+./build/macros/run_iron.mac:77:/run/beamOn 2000
+./build/macros/run_iron.mac:79:/det/setAbsorberThickness 87.85 mm
+./build/macros/run_iron.mac:80:/run/beamOn 2000
+Binary file ./build/BL4S_sim matches
+./src/DetectorConstruction.cc:353:void DetectorConstruction::SetAbsorberMaterial(const G4String& name)
+./src/DetectorConstruction.cc:362:    // thickness changes next. The previous in-place SetMaterial() approach
+./src/DetectorConstruction.cc:370:void DetectorConstruction::SetAbsorberThickness(G4double t)
+./src/DetectorMessenger.cc:20:    fMatCmd = new G4UIcmdWithAString("/det/setAbsorberMaterial", this);
+./src/DetectorMessenger.cc:25:    fThickCmd = new G4UIcmdWithADoubleAndUnit("/det/setAbsorberThickness", this);
+./src/DetectorMessenger.cc:54:        fDetector->SetAbsorberMaterial(value);
+./src/DetectorMessenger.cc:57:        fDetector->SetAbsorberThickness(
+
+== ActionInitialisation.hh ==
+./include/ActionInitialisation.hh
+#pragma once
+// ============================================================
+//  ActionInitialisation.hh
+//  Registers all user action classes with the run manager.
+// ============================================================
+
+#include "G4VUserActionInitialization.hh"
+
+class ActionInitialisation : public G4VUserActionInitialization
+{
+public:
+    ActionInitialisation() = default;
+    ~ActionInitialisation() override = default;
+
+    void BuildForMaster() const override;  // MT: master thread
+    void Build()          const override;  // MT: worker threads / serial
+};

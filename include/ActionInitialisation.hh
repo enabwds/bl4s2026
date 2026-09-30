@@ -1,8 +1,5 @@
-#pragma once
-// ============================================================
-//  ActionInitialisation.hh
-//  Registers all user action classes with the run manager.
-// ============================================================
+#ifndef ACTION_INITIALISATION_HH
+#define ACTION_INITIALISATION_HH
 
 #include "G4VUserActionInitialization.hh"
 
@@ -12,6 +9,8 @@ public:
     ActionInitialisation() = default;
     ~ActionInitialisation() override = default;
 
-    void BuildForMaster() const override;  // MT: master thread
-    void Build()          const override;  // MT: worker threads / serial
+    void BuildForMaster() const override;
+    void Build() const override;
 };
+
+#endif
