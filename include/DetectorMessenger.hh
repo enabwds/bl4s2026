@@ -1,34 +1,46 @@
 #pragma once
+
 // ============================================================
 //  DetectorMessenger.hh
-//  Exposes detector geometry parameters to GEANT4 macro commands.
 //
-//  Usage in .mac files:
-//    /det/setAbsorberMaterial G4_Fe
-//    /det/setAbsorberThickness 20 mm
+//  UI commands for configuring the absorber.
+//
+//  Available commands:
+//
+//    /det/setAbsorberMaterial <material>
+//    /det/setAbsorberThickness <value> <unit>
 //    /det/update
+//
+//  The messenger only passes configuration changes to
+//  DetectorConstruction. It does not contain physics or
+//  analysis logic.
 // ============================================================
 
 #include "G4UImessenger.hh"
-#include "G4UIdirectory.hh"
-#include "G4UIcmdWithAString.hh"
-#include "G4UIcmdWithADoubleAndUnit.hh"
-#include "G4UIcmdWithoutParameter.hh"
+#include "globals.hh"
 
 class DetectorConstruction;
+class G4UIcmdWithAString;
+class G4UIcmdWithADoubleAndUnit;
+class G4UIcmdWithoutParameter;
 
 class DetectorMessenger : public G4UImessenger
 {
 public:
-    explicit DetectorMessenger(DetectorConstruction* det);
+
+    explicit DetectorMessenger(DetectorConstruction* detector);
+
     ~DetectorMessenger() override;
 
-    void SetNewValue(G4UIcommand* command, G4String value) override;
+    void SetNewValue(G4UIcommand* command,
+                     G4String newValue) override;
 
 private:
-    DetectorConstruction*          fDetector;
-    G4UIdirectory*                 fDetDir;
-    G4UIcmdWithAString*            fMatCmd;
-    G4UIcmdWithADoubleAndUnit*     fThickCmd;
-    G4UIcmdWithoutParameter*       fUpdateCmd;
+
+    DetectorConstruction* fDetector = nullptr;
+
+    G4UIcmdWithAString*        fMaterialCommand   = nullptr;
+    G4UIcmdWithADoubleAndUnit* fThicknessCommand  = nullptr;
+    G4UIcmdWithoutParameter*   fUpdateCommand     = nullptr;
 };
+

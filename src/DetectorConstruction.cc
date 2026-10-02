@@ -15,6 +15,7 @@
 #include "G4StateManager.hh"
 #include "G4RunManager.hh"
 #include "G4Exception.hh"
+#include "G4LogicalVolumeStore.hh"
 
 #include <iomanip>
 #include <iostream>
@@ -541,6 +542,7 @@ void DetectorConstruction::ConstructSDandField()
         calorimeterSD =
             new CalorimeterSD(
                 "CalorimeterSD",
+                "CaloHits",
                 kNCols * kNRows
             );
 

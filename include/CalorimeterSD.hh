@@ -1,52 +1,114 @@
 #pragma once
+
 // ============================================================
 //  CalorimeterSD.hh
-//  Sensitive Detector for the 4×4 lead-glass calorimeter.
 //
-//  Each block accumulates the total energy deposited by all
-//  secondaries that pass through it during one event.
-//  At the end of each event the hit collection is written to
-//  the G4HCofThisEvent and picked up by EventAction.
+//  Sensitive detector for the 4x4 lead-glass calorimeter.
+//
+//  Responsibility:
+//    - Create one hit for each calorimeter block.
+//    - Accumulate ALL positive energy deposition in each block.
+//    - Make the raw per-block energy available to EventAction.
+//
+//  This class deliberately does NOT:
+//    - apply energy thresholds
+//    - reject events
+//    - calculate shower features
+//    - perform noise filtering
+//    - perform ML preprocessing
+//
+//  Those operations belong to the analysis layer.
 // ============================================================
 
+#include "G4VHit.hh"
 #include "G4VSensitiveDetector.hh"
 #include "G4THitsCollection.hh"
-#include "G4ThreeVector.hh"
 #include "globals.hh"
 
-// ── Simple hit class ─────────────────────────────────────────────────────────
+// ============================================================
+//  Calorimeter hit
+// ============================================================
+
 class CaloHit : public G4VHit
 {
 public:
-    CaloHit() : fEdep(0.), fBlockID(-1) {}
+    CaloHit()
+        : fEdep(0.0),
+          fBlockID(-1)
+    {}
 
-    void AddEdep(G4double e) { fEdep += e; }
-    G4double    GetEdep()    const { return fEdep; }
-    G4int       GetBlockID() const { return fBlockID; }
-    void        SetBlockID(G4int id) { fBlockID = id; }
+    ~CaloHit() override = default;
+
+    // Accumulate energy deposited in this block.
+    void AddEdep(G4double energy)
+    {
+        fEdep += energy;
+    }
+
+    // Return total energy deposited in this block
+    // during the current event.
+    G4double GetEdep() const
+    {
+        return fEdep;
+    }
+
+    // Block index: 0 ... 15.
+    G4int GetBlockID() const
+    {
+        return fBlockID;
+    }
+
+    void SetBlockID(G4int blockID)
+    {
+        fBlockID = blockID;
+    }
 
 private:
     G4double fEdep;
     G4int    fBlockID;
 };
 
+
+// ============================================================
+//  Hit collection
+// ============================================================
+
 using CaloHitsCollection = G4THitsCollection<CaloHit>;
 
-// ── Sensitive Detector ────────────────────────────────────────────────────────
+
+// ============================================================
+//  Sensitive detector
+// ============================================================
+
 class CalorimeterSD : public G4VSensitiveDetector
 {
 public:
+
     CalorimeterSD(const G4String& name,
                   const G4String& hitsCollectionName,
-                  G4int           nCells);
+                  G4int nCells);
+
     ~CalorimeterSD() override = default;
 
-    void   Initialize(G4HCofThisEvent* hce) override;
-    G4bool ProcessHits(G4Step* step, G4TouchableHistory*) override;
-    void   EndOfEvent(G4HCofThisEvent* hce) override;
+    // Called once at the beginning of every event.
+    void Initialize(G4HCofThisEvent* hce) override;
+
+    // Called for every GEANT4 step inside a sensitive
+    // calorimeter block.
+    G4bool ProcessHits(G4Step* step,
+                       G4TouchableHistory* history) override;
+
+    // Called at the end of every event.
+    void EndOfEvent(G4HCofThisEvent* hce) override;
 
 private:
+
+    // Current event's hit collection.
     CaloHitsCollection* fHitsCollection = nullptr;
-    G4int               fHCID          = -1;
-    G4int               fNCells;
+
+    // GEANT4 collection ID.
+    G4int fHCID = -1;
+
+    // Number of calorimeter cells.
+    G4int fNCells = 0;
 };

@@ -1,61 +1,109 @@
 # ============================================================
-#  macros/run_blind.mac
-#  Blind test: Brass (70% Cu, 30% Zn)
-#  Effective Z ≈ 27.4, effective X0 ≈ 1.54 cm
+# Blind-material validation run
 #
-#  *** SEALED — do not reveal composition to ML/analysis team
-#  *** until after blind prediction is recorded
+# Material is intentionally kept as a separate test configuration.
+# Composition should not be used by the ML/analysis pipeline until
+# the blind prediction has been recorded.
 #
-#  Alternative: replace "Brass" with "G4_W" for tungsten
-#  (harder challenge — extrapolates beyond training range)
+# Brass: 70% Cu + 30% Zn by mass
 # ============================================================
 
-/run/initialize
 /det/setAbsorberMaterial Brass
+/det/setAbsorberThickness 7.7 mm
+
+/run/initialize
+
 /run/verbose 1
 /event/verbose 0
 /tracking/verbose 0
 
-# Same thickness grid as training materials (in mm)
-# 0.5, 1, 2, 3, 4, 5 X0 using X0≈1.54cm
-/gun/energy 1 GeV
-/det/setAbsorberThickness 7.7 mm
-/run/beamOn 2000
-/det/setAbsorberThickness 15.4 mm
-/run/beamOn 2000
-/det/setAbsorberThickness 30.8 mm
-/run/beamOn 2000
-/det/setAbsorberThickness 46.2 mm
-/run/beamOn 2000
-/det/setAbsorberThickness 61.6 mm
-/run/beamOn 2000
-/det/setAbsorberThickness 77.0 mm
+/gun/particle e-
+
+# ============================================================
+# 1 GeV
+# ============================================================
+
+/gun/setNominalEnergy 1 GeV
+
 /run/beamOn 2000
 
-/gun/energy 2 GeV
-/det/setAbsorberThickness 7.7 mm
-/run/beamOn 2000
 /det/setAbsorberThickness 15.4 mm
-/run/beamOn 2000
-/det/setAbsorberThickness 30.8 mm
-/run/beamOn 2000
-/det/setAbsorberThickness 46.2 mm
-/run/beamOn 2000
-/det/setAbsorberThickness 61.6 mm
-/run/beamOn 2000
-/det/setAbsorberThickness 77.0 mm
+/det/update
 /run/beamOn 2000
 
-/gun/energy 4 GeV
-/det/setAbsorberThickness 7.7 mm
-/run/beamOn 2000
-/det/setAbsorberThickness 15.4 mm
-/run/beamOn 2000
 /det/setAbsorberThickness 30.8 mm
+/det/update
 /run/beamOn 2000
+
 /det/setAbsorberThickness 46.2 mm
+/det/update
 /run/beamOn 2000
+
 /det/setAbsorberThickness 61.6 mm
+/det/update
 /run/beamOn 2000
+
 /det/setAbsorberThickness 77.0 mm
+/det/update
 /run/beamOn 2000
+
+# ============================================================
+# 2 GeV
+# ============================================================
+
+/gun/setNominalEnergy 2 GeV
+
+/det/setAbsorberThickness 7.7 mm
+/det/update
+/run/beamOn 2000
+
+/det/setAbsorberThickness 15.4 mm
+/det/update
+/run/beamOn 2000
+
+/det/setAbsorberThickness 30.8 mm
+/det/update
+/run/beamOn 2000
+
+/det/setAbsorberThickness 46.2 mm
+/det/update
+/run/beamOn 2000
+
+/det/setAbsorberThickness 61.6 mm
+/det/update
+/run/beamOn 2000
+
+/det/setAbsorberThickness 77.0 mm
+/det/update
+/run/beamOn 2000
+
+# ============================================================
+# 4 GeV
+# ============================================================
+
+/gun/setNominalEnergy 4 GeV
+
+/det/setAbsorberThickness 7.7 mm
+/det/update
+/run/beamOn 2000
+
+/det/setAbsorberThickness 15.4 mm
+/det/update
+/run/beamOn 2000
+
+/det/setAbsorberThickness 30.8 mm
+/det/update
+/run/beamOn 2000
+
+/det/setAbsorberThickness 46.2 mm
+/det/update
+/run/beamOn 2000
+
+/det/setAbsorberThickness 61.6 mm
+/det/update
+/run/beamOn 2000
+
+/det/setAbsorberThickness 77.0 mm
+/det/update
+/run/beamOn 2000
+

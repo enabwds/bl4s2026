@@ -4,50 +4,140 @@
 
 #include "DetectorMessenger.hh"
 #include "DetectorConstruction.hh"
-#include "G4RunManager.hh"
-#include "G4UImanager.hh"
-#include "G4SystemOfUnits.hh"
 
-DetectorMessenger::DetectorMessenger(DetectorConstruction* det)
-: fDetector(det)
+#include "G4UIcmdWithAString.hh"
+#include "G4UIcmdWithADoubleAndUnit.hh"
+#include "G4UIcmdWithoutParameter.hh"
+#include "G4UIdirectory.hh"
+
+
+// ============================================================
+//  Constructor
+// ============================================================
+
+DetectorMessenger::DetectorMessenger(
+    DetectorConstruction* detector)
+    : fDetector(detector)
 {
-    fDetDir = new G4UIdirectory("/det/");
-    fDetDir->SetGuidance("Detector control commands.");
+    // --------------------------------------------------------
+    //  /det/
+    // --------------------------------------------------------
 
-    fMatCmd = new G4UIcmdWithAString("/det/setAbsorberMaterial", this);
-    fMatCmd->SetGuidance("Set the absorber material (NIST name, e.g. G4_Fe).");
-    fMatCmd->SetParameterName("Material", false);
-    fMatCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+    auto* detectorDirectory = new G4UIdirectory("/det/");
 
-    fThickCmd = new G4UIcmdWithADoubleAndUnit("/det/setAbsorberThickness", this);
-    fThickCmd->SetGuidance("Set absorber slab thickness.");
-    fThickCmd->SetParameterName("Thickness", false);
-    fThickCmd->SetUnitCategory("Length");
-    fThickCmd->SetDefaultUnit("mm");
-    fThickCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+    detectorDirectory->SetGuidance(
+        "Detector configuration commands."
+    );
 
-    fUpdateCmd = new G4UIcmdWithoutParameter("/det/update", this);
-    fUpdateCmd->SetGuidance("Update geometry after parameter changes.");
-    fUpdateCmd->AvailableForStates(G4State_Idle);
+
+    // --------------------------------------------------------
+    //  /det/setAbsorberMaterial
+    // --------------------------------------------------------
+
+    fMaterialCommand =
+        new G4UIcmdWithAString(
+            "/det/setAbsorberMaterial",
+            this
+        );
+
+    fMaterialCommand->SetGuidance(
+        "Set the absorber material."
+    );
+
+    fMaterialCommand->SetParameterName(
+        "material",
+        false
+    );
+
+    fMaterialCommand->AvailableForStates(
+        G4State_PreInit,
+        G4State_Idle
+    );
+
+
+    // --------------------------------------------------------
+    //  /det/setAbsorberThickness
+    // --------------------------------------------------------
+
+    fThicknessCommand =
+        new G4UIcmdWithADoubleAndUnit(
+            "/det/setAbsorberThickness",
+            this
+        );
+
+    fThicknessCommand->SetGuidance(
+        "Set the physical absorber thickness."
+    );
+
+    fThicknessCommand->SetParameterName(
+        "thickness",
+        false
+    );
+
+    fThicknessCommand->SetDefaultUnit("mm");
+
+    fThicknessCommand->SetRange(
+        "thickness > 0."
+    );
+
+    fThicknessCommand->AvailableForStates(
+        G4State_PreInit,
+        G4State_Idle
+    );
+
+
+    // --------------------------------------------------------
+    //  /det/update
+    // --------------------------------------------------------
+
+    fUpdateCommand =
+        new G4UIcmdWithoutParameter(
+            "/det/update",
+            this
+        );
+
+    fUpdateCommand->SetGuidance(
+        "Apply the current detector configuration."
+    );
+
+    fUpdateCommand->AvailableForStates(
+        G4State_Idle
+    );
 }
+
+
+// ============================================================
+//  Destructor
+// ============================================================
 
 DetectorMessenger::~DetectorMessenger()
 {
-    delete fMatCmd;
-    delete fThickCmd;
-    delete fUpdateCmd;
-    delete fDetDir;
+    delete fMaterialCommand;
+    delete fThicknessCommand;
+    delete fUpdateCommand;
 }
 
-void DetectorMessenger::SetNewValue(G4UIcommand* command, G4String value)
+
+// ============================================================
+//  Command handling
+// ============================================================
+
+void DetectorMessenger::SetNewValue(
+    G4UIcommand* command,
+    G4String newValue)
 {
-    if (command == fMatCmd)
-        fDetector->SetAbsorberMaterial(value);
-
-    else if (command == fThickCmd)
+    if (command == fMaterialCommand)
+    {
+        fDetector->SetAbsorberMaterial(newValue);
+    }
+    else if (command == fThicknessCommand)
+    {
         fDetector->SetAbsorberThickness(
-            fThickCmd->GetNewDoubleValue(value));
-
-    else if (command == fUpdateCmd)
-        G4RunManager::GetRunManager()->ReinitializeGeometry();
+            fThicknessCommand->GetNewDoubleValue(newValue)
+        );
+    }
+    else if (command == fUpdateCommand)
+    {
+        fDetector->UpdateGeometry();
+    }
 }

@@ -2,6 +2,7 @@
 #define DETECTOR_CONSTRUCTION_HH
 
 #include "G4VUserDetectorConstruction.hh"
+#include "G4SystemOfUnits.hh"
 #include "globals.hh"
 
 class G4LogicalVolume;

@@ -3,21 +3,39 @@
 // ============================================================
 
 #include "CalorimeterSD.hh"
+
 #include "G4HCofThisEvent.hh"
-#include "G4Step.hh"
 #include "G4SDManager.hh"
-#include "G4ios.hh"
-#include "G4SystemOfUnits.hh"
+#include "G4Step.hh"
+
+
+// ============================================================
+//  Constructor
+// ============================================================
 
 CalorimeterSD::CalorimeterSD(const G4String& name,
                              const G4String& hitsCollectionName,
-                             G4int           nCells)
-: G4VSensitiveDetector(name), fNCells(nCells)
+                             G4int nCells)
+    : G4VSensitiveDetector(name),
+      fNCells(nCells)
 {
     collectionName.insert(hitsCollectionName);
 }
 
-// Called at the start of every event – creates fresh hit objects
+
+// ============================================================
+//  Initialize
+//
+//  Create a fresh hit collection for every event.
+//
+//  We pre-create one hit for every calorimeter block so that
+//  EventAction can safely access:
+//
+//      hit[0] ... hit[15]
+//
+//  even when some blocks receive zero energy.
+// ============================================================
+
 void CalorimeterSD::Initialize(G4HCofThisEvent* hce)
 {
     fHitsCollection = new CaloHitsCollection(
@@ -25,52 +43,83 @@ void CalorimeterSD::Initialize(G4HCofThisEvent* hce)
         collectionName[0]
     );
 
+    // Obtain the collection ID once and reuse it.
     if (fHCID < 0)
+    {
         fHCID = G4SDManager::GetSDMpointer()
                     ->GetCollectionID(collectionName[0]);
+    }
 
     hce->AddHitsCollection(fHCID, fHitsCollection);
 
-    // Pre-allocate one hit per block so indexing is safe
-    for (int i = 0; i < fNCells; ++i) {
-        auto* h = new CaloHit();
-        h->SetBlockID(i);
-        fHitsCollection->insert(h);
+    // One hit object per calorimeter block.
+    for (G4int blockID = 0; blockID < fNCells; ++blockID)
+    {
+        auto* hit = new CaloHit();
+
+        hit->SetBlockID(blockID);
+
+        fHitsCollection->insert(hit);
     }
 }
 
-// Called for every GEANT4 step inside a registered sensitive volume
-G4bool CalorimeterSD::ProcessHits(G4Step* step, G4TouchableHistory*)
+
+// ============================================================
+//  ProcessHits
+//
+//  Called for every GEANT4 step inside a sensitive block.
+//
+//  IMPORTANT:
+//  There is intentionally NO per-step energy threshold.
+//
+//  Tiny deposits must be accumulated rather than discarded.
+//  Any detector threshold/noise model can be applied later in
+//  the analysis layer without changing the underlying GEANT4
+//  truth.
+// ============================================================
+
+G4bool CalorimeterSD::ProcessHits(G4Step* step,
+                                  G4TouchableHistory*)
 {
-    G4double edep = step->GetTotalEnergyDeposit();
+    const G4double energyDeposit =
+        step->GetTotalEnergyDeposit();
 
-    // Ignore steps with no energy deposition.
-    // IMPORTANT:
-    // Do NOT apply a threshold here.
-    // Individual small deposits must be accumulated first.
-    if (edep <= 0.)
+    // Ignore steps that deposit no energy.
+    if (energyDeposit <= 0.0)
+    {
         return false;
+    }
 
-    // copyNumber encodes which block (0–15) was hit
-    G4int blockID = step->GetPreStepPoint()
-                        ->GetTouchable()
-                        ->GetReplicaNumber(0);
+    // The block copy number identifies which of the 16
+    // calorimeter blocks received this energy deposit.
+    const G4int blockID =
+        step->GetPreStepPoint()
+            ->GetTouchable()
+            ->GetReplicaNumber(0);
 
-    (*fHitsCollection)[blockID]->AddEdep(edep);
+    // Safety check before indexing the collection.
+    if (blockID < 0 || blockID >= fNCells)
+    {
+        return false;
+    }
+
+    // Accumulate the energy deposit.
+    (*fHitsCollection)[blockID]->AddEdep(energyDeposit);
 
     return true;
 }
 
+
+// ============================================================
+//  EndOfEvent
+//
+//  Nothing is filtered or transformed here.
+//
+//  EventAction is responsible for reading the completed hit
+//  collection and constructing the event-level output.
+// ============================================================
+
 void CalorimeterSD::EndOfEvent(G4HCofThisEvent*)
 {
-    // Optional: print a per-event summary (uncomment for debugging)
-    /*
-    G4cout << "  -- Calorimeter hits (>0 MeV) --\n";
-    for (int i = 0; i < fNCells; ++i) {
-        G4double e = (*fHitsCollection)[i]->GetEdep();
-        if (e > 0.)
-            G4cout << "    Block " << i << ": "
-                   << e/MeV << " MeV\n";
-    }
-    */
+    // Intentionally empty.
 }

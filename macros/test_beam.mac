@@ -3,24 +3,22 @@
 # 100 events at 1, 2, and 4 GeV
 # ============================================================
 
-/run/initialize
-
 /det/setAbsorberMaterial G4_Fe
 /det/setAbsorberThickness 35.14 mm
+
+/run/initialize
 
 /run/verbose 1
 /event/verbose 0
 /tracking/verbose 0
 
-# ── 1 GeV ────────────────────────────────────────────────────
 /gun/particle e-
-/gun/energy 1 GeV
+
+/gun/setNominalEnergy 1 GeV
 /run/beamOn 100
 
-# ── 2 GeV ────────────────────────────────────────────────────
-/gun/energy 2 GeV
+/gun/setNominalEnergy 2 GeV
 /run/beamOn 100
 
-# ── 4 GeV ────────────────────────────────────────────────────
-/gun/energy 4 GeV
+/gun/setNominalEnergy 4 GeV
 /run/beamOn 100
