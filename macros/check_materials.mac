@@ -1,0 +1,14 @@
+/det/setAbsorberMaterial G4_Al
+/det/setAbsorberThickness 1 mm
+
+/det/setAbsorberMaterial G4_Fe
+/det/setAbsorberThickness 1 mm
+
+/det/setAbsorberMaterial G4_Cu
+/det/setAbsorberThickness 1 mm
+
+/det/setAbsorberMaterial G4_W
+/det/setAbsorberThickness 1 mm
+
+/det/setAbsorberMaterial G4_Pb
+/det/setAbsorberThickness 1 mm

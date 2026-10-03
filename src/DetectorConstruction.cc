@@ -255,7 +255,7 @@ DetectorConstruction::Construct()
 
     new G4PVPlacement(
         nullptr,
-        G4ThreeVector(0, 0, -100.0 * cm),
+        G4ThreeVector(0, 0, -110.0 * cm),
         cherenkovWindowLogical,
         "CherenkovWindow",
         worldLogical,
@@ -269,7 +269,7 @@ DetectorConstruction::Construct()
             "CherenkovGas",
             10.0 * cm,
             10.0 * cm,
-            50.0 * cm
+            1.0 * cm
         );
 
     auto* cherenkovGasLogical =
@@ -279,16 +279,16 @@ DetectorConstruction::Construct()
             "CherenkovGas"
         );
 
-    new G4PVPlacement(
-        nullptr,
-        G4ThreeVector(0, 0, -50.0 * cm),
-        cherenkovGasLogical,
-        "CherenkovGas",
-        worldLogical,
-        false,
-        0,
-        true
-    );
+//    new G4PVPlacement(
+//        nullptr,
+//        G4ThreeVector(0, 0, -50.0 * cm),
+//        cherenkovGasLogical,
+//        "CherenkovGas",
+//        worldLogical,
+//        false,
+//        0,
+//        true
+//    );
 
     // --------------------------------------------------------
     // Drift chambers

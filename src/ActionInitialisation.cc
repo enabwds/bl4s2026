@@ -915,45 +915,7 @@ public:
         // absorber. This is only for the sanity check and
         // should be removed afterwards.
         // ----------------------------------------------------
-
-        if (inAbsorber)
-        {
-            static G4int debugAbsorberSteps = 0;
-
-            if (debugAbsorberSteps < 20)
-            {
-                G4cout
-                    << "[ABSORBER DEBUG] "
-                    << "edep = "
-                    << edep / MeV
-                    << " MeV"
-                    << " | pre volume = "
-                    << preVolumeName
-                    << " | post volume = ";
-
-                if (postVolume)
-                {
-                    G4cout
-                        << postVolumeName;
-                }
-                else
-                {
-                    G4cout
-                        << "NULL";
-                }
-
-                G4cout
-                    << " | track = "
-                    << track->GetTrackID()
-                    << " | particle = "
-                    << track->GetParticleDefinition()
-                        ->GetParticleName()
-                    << G4endl;
-
-                ++debugAbsorberSteps;
-            }
-        }
-
+ 
         // ----------------------------------------------------
         // Absorber energy deposition
         // ----------------------------------------------------

@@ -1,0 +1,170 @@
+/run/initialize
+
+# ============================================================
+# MATERIAL SCAN
+# 5 materials × 3 thicknesses × 3 energies
+# 100 events per configuration
+#
+# Thicknesses are exact GEANT4 radiation lengths:
+#
+# Al: 88.9632 mm
+# Fe: 17.5749 mm
+# Cu: 14.3558 mm
+# W :  3.50418 mm
+# Pb:  5.61253 mm
+# ============================================================
+
+
+# ============================================================
+# ALUMINIUM
+# ============================================================
+
+/det/setAbsorberMaterial G4_Al
+
+/det/setAbsorberThickness 88.9632 mm
+/gun/setNominalEnergy 1 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 2 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 4 GeV
+/run/beamOn 100
+
+/det/setAbsorberThickness 177.9264 mm
+/gun/setNominalEnergy 1 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 2 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 4 GeV
+/run/beamOn 100
+
+/det/setAbsorberThickness 266.8896 mm
+/gun/setNominalEnergy 1 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 2 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 4 GeV
+/run/beamOn 100
+
+
+# ============================================================
+# IRON
+# ============================================================
+
+/det/setAbsorberMaterial G4_Fe
+
+/det/setAbsorberThickness 17.5749 mm
+/gun/setNominalEnergy 1 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 2 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 4 GeV
+/run/beamOn 100
+
+/det/setAbsorberThickness 35.1498 mm
+/gun/setNominalEnergy 1 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 2 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 4 GeV
+/run/beamOn 100
+
+/det/setAbsorberThickness 52.7247 mm
+/gun/setNominalEnergy 1 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 2 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 4 GeV
+/run/beamOn 100
+
+
+# ============================================================
+# COPPER
+# ============================================================
+
+/det/setAbsorberMaterial G4_Cu
+
+/det/setAbsorberThickness 14.3558 mm
+/gun/setNominalEnergy 1 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 2 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 4 GeV
+/run/beamOn 100
+
+/det/setAbsorberThickness 28.7116 mm
+/gun/setNominalEnergy 1 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 2 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 4 GeV
+/run/beamOn 100
+
+/det/setAbsorberThickness 43.0674 mm
+/gun/setNominalEnergy 1 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 2 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 4 GeV
+/run/beamOn 100
+
+
+# ============================================================
+# TUNGSTEN
+# ============================================================
+
+/det/setAbsorberMaterial G4_W
+
+/det/setAbsorberThickness 3.50418 mm
+/gun/setNominalEnergy 1 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 2 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 4 GeV
+/run/beamOn 100
+
+/det/setAbsorberThickness 7.00836 mm
+/gun/setNominalEnergy 1 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 2 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 4 GeV
+/run/beamOn 100
+
+/det/setAbsorberThickness 10.51254 mm
+/gun/setNominalEnergy 1 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 2 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 4 GeV
+/run/beamOn 100
+
+
+# ============================================================
+# LEAD
+# ============================================================
+
+/det/setAbsorberMaterial G4_Pb
+
+/det/setAbsorberThickness 5.61253 mm
+/gun/setNominalEnergy 1 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 2 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 4 GeV
+/run/beamOn 100
+
+/det/setAbsorberThickness 11.22506 mm
+/gun/setNominalEnergy 1 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 2 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 4 GeV
+/run/beamOn 100
+
+/det/setAbsorberThickness 16.83759 mm
+/gun/setNominalEnergy 1 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 2 GeV
+/run/beamOn 100
+/gun/setNominalEnergy 4 GeV
+/run/beamOn 100
